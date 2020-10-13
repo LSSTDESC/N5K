@@ -6,19 +6,17 @@ In this challenge, you are asked to compute a set of power spectra for a 3x2pt (
 
 The challenge entries will be evaluated on the basis of accuracy and speed. The code which can accomplish this task fastest and within the accuracy requirements of an LSST Y10 cosmological analysis will win the challenge. The winning code will be incorporated for use as the non-Limber integration tool for the [Core Cosmology Library](https://github.com/LSSTDESC/CCL/).
 
-## Challenge set-up
-
-The challenge asks you to compute a datavector containing the $C-\ell$s required for a 3x2pt analysis setup following that used for the LSST Y10 scenario in the [LSST DESC Science Requirements Document v1](https://arxiv.org/pdf/1809.01669.pdf). The 'input' folder of this repo contains the required inputs for this calculation, derived from those included with the Science Requirements Document [Data Products Release](https://zenodo.org/record/2662127#.X2NtDobTWEA) (LICENSE!):
-- kernels for the 10 number counts tracers and 5 weak lensing tracers as a function of z  (N5K/input/kernels.npz)
-- linear and nonlinear version of the matter power spectrum as a function of k and z (N5K/input/Pk.npz)
-- $\ell$ values at which you should compute the $C_\ell$s (N5K/input/ell-values)
-- notes on which auto- and cross-spectra to include in your calculation and the structure in which to output the data vector (N5K/input/README.md). These are the same as those included in the SRD LSST Y10 setup. Broadly: all cosmic shear spectra should be included (ignoring duplicates), some galaxy-galaxy lensing spectra should be included, and only auto-spectra of clustering spectra should be included. Those spectra which are not included are omitted because their values are sufficiently negligible that they would not be expected to be included in a 3x2pt analysis. The resulting data vector will have 1000 elements.
+All entrants will have the opportunity to be an author on the resulting paper.
 
 ## How to enter
 
-Make a pull request to this repository which includes (WHAT). 
+The challenge asks you to compute the $C-\ell$s required for a 3x2pt analysis setup similar to the LSST Y10 scenario in the [LSST DESC Science Requirements Document v1](https://arxiv.org/pdf/1809.01669.pdf). The 'input' folder of this repo contains some required inputs for this calculation, derived in some cases from those included with the Science Requirements Document [Data Products Release](https://zenodo.org/record/2662127#.X2NtDobTWEA):
+- kernels for the 10 number counts tracers and 5 weak lensing tracers as a function of z  (N5K/input/kernels.npz)
+- linear and nonlinear version of the matter power spectrum as a function of k and z (N5K/input/Pk.npz)
 
-All entrants will have the opportunity to be an author on the resulting paper.
+N5K/n5k/calculator\_base.py contains a base class N5KCalculatorBase. Write a subclass of N5KCalculatorBase which contains methods setup() (to set up your nonlimber calculation) and run() (to run it). N5K/n5k/calculator\_ccl.py contains an example of what this would look like doing the calculation using CCL's current (Limber) $C_\ell$ calculation tools.
+
+Make a pull request to this repository which includes your new subclass. 
 
 ## Deadline
 
