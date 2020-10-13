@@ -6,12 +6,6 @@ class N5KCalculatorBase(object):
     needed_fields = ['output_prefix']
     nb_g = 10
     nb_s = 5
-    cosmo = {'OmegaM': 0.3156,
-             'OmegaB': 0.0492,
-             'w0': -1.0,
-             'h': 0.6727,
-             'A_s': 2.12107E-9,
-             'n_s': 0.9645}
 
     def __init__(self, fname_config):
         import yaml
@@ -26,29 +20,40 @@ class N5KCalculatorBase(object):
             if not self.config.get(name):
                 raise ValueError(f"You must provide {name}")
 
-    def get_bias(self):
-        b = np.array([1.376695,
-                      1.451179,
-                      1.528404,
-                      1.607983,
-                      1.689579,
-                      1.772899,
-                      1.857700,
-                      1.943754,
-                      2.030887,
-                      2.118943])
-        return b
+    def get_pk(self):
+        return np.load('input/pk.npz')
 
-    def get_A_IA(self):
-        return 0.15
-        
-    def get_nz_g(self):
-        d = np.loadtxt('input/dNdz_clust_LSSTSRD_zb0_sigz0.03.dat', unpack=True)
-        return d[0], d[1:]
+    def get_cosmological_parameters(self):
+        return {'Omega_m': 0.3156,
+                'Omega_b': 0.0492,
+                'w0': -1.0,
+                'h': 0.6727,
+                'A_s': 2.12107E-9,
+                'n_s': 0.9645}
 
-    def get_nz_s(self):
-        d = np.loadtxt('input/dNdz_srcs_LSSTSRD_zb0_sigz0.05.dat', unpack=True)
-        return d[0], d[1:]
+    def get_tracer_parameters(self):
+        # Per-bin galaxy bias
+        b_g = np.array([1.376695, 1.451179, 1.528404,
+                        1.607983, 1.689579, 1.772899,
+                        1.857700, 1.943754, 2.030887,
+                        2.118943])
+        # Amplitude of NLA model (accounting for f_red already)
+        A_IA = np.full(5, 0.15)
+        return {'b_g': b_g,
+                'A_IA': A_IA}
+
+    def get_tracer_dndzs(self):
+        dNdz_sh = np.loadtxt('input/dNdz_srcs_LSSTSRD_zb0_sigz0.05.dat', unpack=True)
+        z_sh = dNdz_sh[0, :]
+        dNdz_sh = dNdz_sh[1:, :]
+        dNdz_cl = np.loadtxt('input/dNdz_clust_LSSTSRD_zb0_sigz0.03.dat', unpack=True)
+        z_cl = dNdz_cl[0, :]
+        dNdz_cl = dNdz_cl[1:, :]
+        return {'z_sh': z_sh, 'dNdz_sh': dNdz_sh,
+                'z_cl': z_cl, 'dNdz_cl': dNdz_cl}
+
+    def get_tracer_kernels(self):
+        return np.load("input/kernels.npz")
 
     def get_ells(self):
         return np.unique(np.geomspace(2, 2000, 128).astype(int)).astype(float)
@@ -63,9 +68,6 @@ class N5KCalculatorBase(object):
         ls = self.get_ells()
         nl = len(ls)
         ngg, ngs, nss = self.get_num_cls()
-        print(self.cls_gg.shape)
-        print(self.cls_gs.shape)
-        print(self.cls_ss.shape)
         if self.cls_gg.shape != (ngg, nl):
             raise ValueError("Incorrect G-G spectra shape")
         if self.cls_gs.shape != (ngs, nl):

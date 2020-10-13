@@ -1,0 +1,4 @@
+# Ignore emacs backup files
+*~
+
+n5k/__pycache__/
