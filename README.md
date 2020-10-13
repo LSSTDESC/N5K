@@ -13,10 +13,14 @@ All entrants will have the opportunity to be an author on the resulting paper.
 The challenge asks you to compute the angular spectra required for a 3x2pt analysis setup similar to the LSST Y10 scenario in the [LSST DESC Science Requirements Document v1](https://arxiv.org/pdf/1809.01669.pdf). The 'input' folder of this repo contains some required inputs for this calculation, derived in some cases from those included with the Science Requirements Document [Data Products Release](https://zenodo.org/record/2662127#.X2NtDobTWEA):
 - kernels for the 10 number counts tracers and 5 weak lensing tracers as a function of z  (N5K/input/kernels.npz)
 - linear and nonlinear version of the matter power spectrum as a function of k and z (N5K/input/Pk.npz)
+- dN/dz's for the 10 number counts tracers and 5 weak lensing tracers as a function of z (N5K/input/dNdzs.npz) (NEED TO ADD)
 
 N5K/n5k/calculator\_base.py contains a base class N5KCalculatorBase. Write a subclass of N5KCalculatorBase which contains methods setup() (to set up your nonlimber calculation) and run() (to run it). N5K/n5k/calculator\_ccl.py contains an example of what this would look like doing the calculation using CCL's current (Limber) calculation tools.
 
 Make a pull request to this repository which includes your new subclass. 
+
+If you choose to use given dN/dz's instead of the precomputed full kernels, it is your responsibility to ensure other required cosmological factors are correctly computed using the parameters defined in the base class.
+
 
 ## Deadline
 
