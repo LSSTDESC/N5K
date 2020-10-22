@@ -18,31 +18,28 @@ cosmo = ccl.Cosmology(Omega_c=par['Omega_m'] - par['Omega_b'],
 # Generate power spectrum
 z = np.linspace(0, 3.5, 50)
 k = np.logspace(-4, 2, 200)
-pkln = np.array([ccl.linear_matter_power(cosmo, k, a)
-                 for a in 1/(1+z)])
 pknl = np.array([ccl.nonlin_matter_power(cosmo, k, a)
                  for a in 1/(1+z)])
-np.savez('input/pk.npz', k=k, z=z, pk_nl=pknl, pk_lin=pkln)
+np.savez('input/pk.npz', k=k, z=z, pk_nl=pknl)
 
 # Generate tracer kernels
 dndzs = cal.get_tracer_dndzs()
 z_cl = dndzs['z_cl']
 z_sh = dndzs['z_sh']
 tpar = cal.get_tracer_parameters()
+
 Cl_tracers = [ccl.NumberCountsTracer(cosmo, False,
-                                     (z_cl, n),
+                                     (z_cl, dndzs['dNdz_cl'][:, ni]),
                                      bias=(z_cl, np.full(len(z_cl), b)))
-              for n, b in zip(dndzs['dNdz_cl'], tpar['b_g'])]
-Sh_tracers = [ccl.WeakLensingTracer(cosmo, (z_sh, n), True,
-                                    ia_bias=(z_sh, np.full(len(z_sh), A)))
-              for n, A in zip(dndzs['dNdz_sh'], tpar['A_IA'])]
+              for (ni, b) in zip(range(0, 10), tpar['b_g'])]
+Sh_tracers = [ccl.WeakLensingTracer(cosmo, (z_sh, dndzs['dNdz_sh'][:, ni]),
+                                    True)
+              for ni in range(0, 5)]
 
 chi_sh = ccl.comoving_radial_distance(cosmo, 1./(1.+z_sh))
 chi_cl = ccl.comoving_radial_distance(cosmo, 1./(1.+z_cl))
 kernels_cl = np.array([t.get_kernel(chi_cl)[0] for t in Cl_tracers])
 kernels_sh = np.array([t.get_kernel(chi_sh)[0] for t in Sh_tracers])
-kernels_ia = np.array([t.get_kernel(chi_sh)[1] for t in Sh_tracers])
 np.savez('input/kernels.npz',
          z_cl=z_cl, chi_cl=chi_cl, kernels_cl=kernels_cl,
-         z_sh=z_sh, chi_sh=chi_sh, kernels_sh=kernels_sh,
-         z_ia=z_sh, chi_ia=chi_sh, kernels_ia=kernels_ia)
+         z_sh=z_sh, chi_sh=chi_sh, kernels_sh=kernels_sh)
