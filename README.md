@@ -12,8 +12,9 @@ All entrants will have the opportunity to be an author on the resulting paper.
 
 The challenge asks you to compute the angular spectra required for a 3x2pt analysis setup similar to the LSST Y10 scenario in the [LSST DESC Science Requirements Document v1](https://arxiv.org/pdf/1809.01669.pdf). The 'input' folder of this repo contains some required inputs for this calculation, derived in some cases from those included with the Science Requirements Document [Data Products Release](https://zenodo.org/record/2662127#.X2NtDobTWEA):
 - kernels for the 10 number counts tracers and 5 weak lensing tracers as a function of z  (N5K/input/kernels.npz)
-- linear and nonlinear version of the matter power spectrum as a function of k and z (N5K/input/Pk.npz)
-- dN/dz's for the 10 number counts tracers and 5 weak lensing tracers as a function of z (N5K/input/dNdzs.npz) (NEED TO ADD)
+- nonlinear matter power spectrum as a function of k and z (N5K/input/Pk.npz)
+- dN/dz's for the 10 number counts tracers and 5 weak lensing tracers as a function of z (N5K/input/dNdzs.npz)
+For the purposes of the challenge, we ignore intrinsic alignments and redshift-space distortions. The kernels are thus number counts and cosmic shear only.
 
 N5K/n5k/calculator\_base.py contains a base class N5KCalculatorBase. Write a subclass of N5KCalculatorBase which contains methods setup() (to set up your nonlimber calculation) and run() (to run it). N5K/n5k/calculator\_ccl.py contains an example of what this would look like doing the calculation using CCL's current (Limber) calculation tools.
 
@@ -21,7 +22,7 @@ Specifically, the non-Limber integral to be computed for each element of the ang
 
 <img src="https://render.githubusercontent.com/render/math?math=C_\ell = \frac{2}{\pi} \int_0^\infty dz_1 K(z_1) \int_0^\infty dz_2 K(z_2) \int_0^\infty dk \, k^2 P_\delta(k,z1,z2)j_\ell(k \chi(z_1))j_\ell(k \chi(z_2))">
 
-where K are the kernels and <img src="https://render.githubusercontent.com/render/math?math=P_\delta"> is the non-linear (?) matter power spectrum.
+where K are the kernels and <img src="https://render.githubusercontent.com/render/math?math=P_\delta"> is the non-linear matter power spectrum. You should assume that <img src="https://render.githubusercontent.com/render/math?math=P_\delta(k,z_1,z_2) = \sqrt{P_\delta(k,z_1)P_\delta(k,z_2)}">.
 
 Make a pull request to this repository which includes your new subclass. 
 
@@ -30,7 +31,7 @@ If you choose to use given dN/dz's instead of the precomputed full kernels, it i
 
 ## Deadline
 
-The challenge will close on December 15, 2020 (CONFIRM).
+The challenge will close on December 15, 2020.
 
 ## FAQ
 
