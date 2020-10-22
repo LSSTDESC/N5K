@@ -43,12 +43,11 @@ class N5KCalculatorBase(object):
                 'A_IA': A_IA}
 
     def get_tracer_dndzs(self):
-        dNdz_sh = np.loadtxt('input/dNdz_srcs_LSSTSRD_zb0_sigz0.05.dat', unpack=True)
-        z_sh = dNdz_sh[0, :]
-        dNdz_sh = dNdz_sh[1:, :]
-        dNdz_cl = np.loadtxt('input/dNdz_clust_LSSTSRD_zb0_sigz0.03.dat', unpack=True)
-        z_cl = dNdz_cl[0, :]
-        dNdz_cl = dNdz_cl[1:, :]
+        dNdz_file = np.load('input/dNdzs.npz')
+        z_sh = dNdz_file['z_sh']
+        dNdz_sh = dNdz_file['dNdz_sh']
+        z_cl = dNdz_file['z_cl']
+        dNdz_cl = dNdz_file['dNdz_cl']
         return {'z_sh': z_sh, 'dNdz_sh': dNdz_sh,
                 'z_cl': z_cl, 'dNdz_cl': dNdz_cl}
 
