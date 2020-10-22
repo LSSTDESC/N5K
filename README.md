@@ -10,7 +10,7 @@ All entrants will have the opportunity to be an author on the resulting paper.
 
 ## How to enter
 
-The challenge asks you to compute the angular spectra required for a 3x2pt analysis setup similar to the LSST Y10 scenario in the [LSST DESC Science Requirements Document v1](https://arxiv.org/pdf/1809.01669.pdf). The 'input' folder of this repo contains some required inputs for this calculation, derived in some cases from those included with the Science Requirements Document [Data Products Release](https://zenodo.org/record/2662127#.X2NtDobTWEA):
+The challenge asks you to compute the angular spectra required for a 3x2pt analysis setup similar to the LSST Y10 scenario in the [LSST DESC Science Requirements Document v1](https://arxiv.org/pdf/1809.01669.pdf). The 'input' folder of this repo contains some required inputs for this calculation:
 - kernels for the 10 number counts tracers and 5 weak lensing tracers as a function of z  (N5K/input/kernels.npz)
 - nonlinear matter power spectrum as a function of k and z (N5K/input/Pk.npz)
 - dN/dz's for the 10 number counts tracers and 5 weak lensing tracers as a function of z (N5K/input/dNdzs.npz)
@@ -43,12 +43,3 @@ Yes, you can, and you can be an author on the paper (we have a special exemption
 **What is the accuracy level I should be aiming for?**
 
 The required accuracy level will be calculated as that which introduces a spurious <img src="https://render.githubusercontent.com/render/math?math=\chi^2"> which is less than 1 for an LSST Y10 3x2pt analysis as defined in the SRD, computed using a Gaussian covariance matrix. The precise tolerable error for a representative set of <img src="https://render.githubusercontent.com/render/math?math=\ell"> will be posted before the challenge deadline for comparison but is not yet available.
-
-## License information
-
-We make use of both modified and original data products from the LSST Dark Energy Science Collaboration (DESC) Science Requirements Document v1 Released Data Products (citation below), which are subject to the [Creative Commons Attribution Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/legalcode) license.
-
-(License for this repo?)
-
-The LSST Dark Energy Science Collaboration, Mandelbaum, Rachel, Eifler, Tim, Hlozek, Renee, Collett, Thomas, Gawiser, Eric, … Troxel, M. A. (2018). The LSST Dark Energy Science Collaboration (DESC) Science Requirements Document v1 Released Data Products (Version 1.0.1) [Data set]. Zenodo. http://doi.org/10.5281/zenodo.2662127
-
