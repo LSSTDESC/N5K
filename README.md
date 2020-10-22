@@ -17,6 +17,12 @@ The challenge asks you to compute the angular spectra required for a 3x2pt analy
 
 N5K/n5k/calculator\_base.py contains a base class N5KCalculatorBase. Write a subclass of N5KCalculatorBase which contains methods setup() (to set up your nonlimber calculation) and run() (to run it). N5K/n5k/calculator\_ccl.py contains an example of what this would look like doing the calculation using CCL's current (Limber) calculation tools.
 
+Specifically, the non-Limber integral to be computed for each element of the angular power spectrum is:
+
+<img src="https://render.githubusercontent.com/render/math?math=C_\ell = \frac{2}{\pi} \int_0^\infty dz_1 K(z_1) \int_0^\infty dz_2 K(z_2) \int_0^\infty dk \, k^2 P_\delta(k,z1,z2)j_\ell(k \chi(z_1))j_\ell(k \chi(z_2))">
+
+where K are the kernels and <img src="https://render.githubusercontent.com/render/math?math=P_\delta"> is the non-linear (?) matter power spectrum.
+
 Make a pull request to this repository which includes your new subclass. 
 
 If you choose to use given dN/dz's instead of the precomputed full kernels, it is your responsibility to ensure other required cosmological factors are correctly computed using the parameters defined in the base class.
