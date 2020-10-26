@@ -6,7 +6,7 @@ In this challenge, you are asked to compute a set of power spectra for a 3x2pt (
 
 The challenge entries will be evaluated on the basis of accuracy, speed, and integrability with the [Core Cosmology Library](https://github.com/LSSTDESC/CCL/) (CCL). CCL is python (with some heavy-lifting done in C under the hood); a code which is in python or has a python wrapper will satisfy the integrability criteria. Given this, the code which can accomplish the challenge task fastest and within the accuracy requirements of an LSST Y10 cosmological analysis will win the challenge. The winning code will be incorporated for use as the non-Limber integration tool for CCL.
 
-All entrants will have the opportunity to be an author on the resulting paper.
+All entrants will have the opportunity to be an author on the resulting paper, which will describe the challenge, compare the different methods, detail the results, and discuss lessons learned.
 
 ## How to enter
 
@@ -38,7 +38,7 @@ The challenge will close on January 15, 2020.
 
 **Can I participate if I am not a member of DESC?**
 
-Yes, you can, and you can be an author on the paper (we have a special exemption from the pub policy for this challenge). 
+Yes, you can, and you can be an author on the paper (we have a special exemption from the Publication Policy for this challenge). 
 
 We request that all non-DESC entrants agree to abide by the [DESC Code of Conduct](https://lsstdesc.org/assets/pdf/policies/LSST_DESC_Professional_Conduct.pdf) throughout their participation in the challenge (as DESC entrants are also expected to do).
 
