@@ -1,5 +1,3 @@
-# DRAFT
-
 # N5K: Non-local No-Nonsense Non-Limber Numerical Knockout
 
 In this challenge, you are asked to compute a set of power spectra for a 3x2pt (cosmic shear, galaxy-galaxy lensing, and galaxy clustering) analysis without the use of the Limber approximation.
