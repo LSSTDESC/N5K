@@ -9,9 +9,10 @@ All entrants will have the opportunity to be an author on the resulting paper, w
 ## How to enter
 
 The challenge asks you to compute the angular spectra required for a 3x2pt analysis setup similar to the LSST Y10 scenario in the [LSST DESC Science Requirements Document v1](https://arxiv.org/pdf/1809.01669.pdf). The 'input' folder of this repo contains some required inputs for this calculation:
-- kernels for the 10 number counts tracers and 5 weak lensing tracers as a function of comoving radial distance chi  [N5K/input/kernels.npz](input/kernels.npz)
-- nonlinear matter power spectrum as a function of k and z [N5K/input/Pk.npz](input/Pk.npz)
-- dN/dz's for the 10 number counts tracers and 5 weak lensing tracers as a function of z [N5K/input/dNdzs.npz](input/dNdzs.npz)
+- kernels for the 10 number counts tracers and 5 weak lensing tracers as a function of comoving radial distance chi  [N5K/input/kernels.npz](input/kernels.npz).
+- Linear and non-linear matter power spectrum as a function of k and z [N5K/input/Pk.npz](input/Pk.npz).
+- Background radial comoving distance and normalized expansion rate (H(z)/H(0)), in case you need them: [N5K/input/background.npz](input/background.npz).
+- dN/dz's for the 10 number counts tracers and 5 weak lensing tracers as a function of z [N5K/input/dNdzs.npz](input/dNdzs.npz).
 
 For the purposes of the challenge, we ignore intrinsic alignments, redshift-space distortions, and magnification. The kernels are thus number counts and cosmic shear only.
 
