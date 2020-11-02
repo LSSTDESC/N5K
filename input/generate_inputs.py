@@ -18,9 +18,11 @@ cosmo = ccl.Cosmology(Omega_c=par['Omega_m'] - par['Omega_b'],
 # Generate power spectrum
 z = np.linspace(0, 3.5, 50)
 k = np.logspace(-4, 2, 200)
+pkln = np.array([ccl.linear_matter_power(cosmo, k, a)
+                 for a in 1/(1+z)])
 pknl = np.array([ccl.nonlin_matter_power(cosmo, k, a)
                  for a in 1/(1+z)])
-np.savez('input/pk.npz', k=k, z=z, pk_nl=pknl)
+np.savez('input/pk.npz', k=k, z=z, pk_nl=pknl, pk_lin=pkln)
 
 # Generate tracer kernels
 dndzs = cal.get_tracer_dndzs()
@@ -43,3 +45,9 @@ kernels_sh = np.array([t.get_kernel(chi_sh)[0] for t in Sh_tracers])
 np.savez('input/kernels.npz',
          z_cl=z_cl, chi_cl=chi_cl, kernels_cl=kernels_cl,
          z_sh=z_sh, chi_sh=chi_sh, kernels_sh=kernels_sh)
+
+# Generate background arrays
+zs = np.linspace(0, 100, 1024)
+chis = ccl.comoving_radial_distance(cosmo, 1./(1.+zs))
+ez = ccl.h_over_h0(cosmo, 1./(1.+zs))
+np.savez('input/background.npz', z=zs, chi=chis, Ez=ez)
