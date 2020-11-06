@@ -21,7 +21,6 @@ class N5KCalculatorCCL(N5KCalculatorBase):
         self.cosmo._set_nonlin_power_from_arrays(a_array=a,
                                                  k_array=dpk['k'],
                                                  pk_array=dpk['pk_nl'][::-1][:])
-        #s8 = ccl.sigma8(self.cosmo)
 
         # Initialize tracers
         if self.config.get('tracers_from_kernels', False):
@@ -53,15 +52,6 @@ class N5KCalculatorCCL(N5KCalculatorBase):
                         for ni, b in zip(range(0,10), tpar['b_g'])]
             self.t_s = [ccl.WeakLensingTracer(self.cosmo, (z_s, nzs['dNdz_sh'][:, ni]), True)
                         for ni in range(0,5)]
-            #nzs = self.get_tracer_dndzs()
-            #tpar = self.get_tracer_parameters()
-            #z_g = nzs['z_cl']
-            #z_s = nzs['z_sh']
-            #self.t_g = [ccl.NumberCountsTracer(self.cosmo, True, (z_g, dndzs['dNdz_cl'][:, ni]),
-            #                                   bias=(z_g, np.full(len(z_g), b)))
-            #            for ni, b in zip(range(0,10), tpar['b_g'])]
-            #self.t_s = [ccl.WeakLensingTracer(self.cosmo, (z_s, dndzs['dNdz_sh'][:, ni]), True)
-            #            for n in range(0,5)]
 
     def run(self):
         # Compute power spectra
