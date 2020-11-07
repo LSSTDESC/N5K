@@ -2,7 +2,10 @@ import numpy as np
 import time
 import n5k
 
-# The evaluation of challenge entries will also include accuracy and integratbility - this script is just to show an example of timing an entry.
+
+# The evaluation of challenge entries will also include accuracy and
+# integratbility - this script is just to show an example of timing
+# an entry.
 
 def time_run(cls, config):
     c = cls(config)
