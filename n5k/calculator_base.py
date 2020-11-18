@@ -37,7 +37,9 @@ class N5KCalculatorBase(object):
                         1.607983, 1.689579, 1.772899,
                         1.857700, 1.943754, 2.030887,
                         2.118943])
-        return {'b_g': b_g}
+        A_IA = np.full(5, 0.15)	
+        return {'b_g': b_g,
+                'A_IA': A_IA}
 
     def get_tracer_dndzs(self):
         dNdz_file = np.load('input/dNdzs.npz')
@@ -45,8 +47,8 @@ class N5KCalculatorBase(object):
         dNdz_sh = dNdz_file['dNdz_sh']
         z_cl = dNdz_file['z_cl']
         dNdz_cl = dNdz_file['dNdz_cl']
-        return {'z_sh': z_sh, 'dNdz_sh': dNdz_sh,
-                'z_cl': z_cl, 'dNdz_cl': dNdz_cl}
+        return {'z_sh': z_sh, 'dNdz_sh': dNdz_sh.T,
+                'z_cl': z_cl, 'dNdz_cl': dNdz_cl.T}
 
     def get_tracer_kernels(self):
         return np.load("input/kernels.npz")

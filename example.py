@@ -17,6 +17,6 @@ def time_run(cls, config):
     c.teardown()
     print(f'{cls.name}: t={tf-t0}s')
 
-for cls, config in zip([n5k.N5KCalculatorBase, n5k.N5KCalculatorCCL, n5k.N5KCalculatorCCL],
-                       ['tests/config.yml', 'tests/config.yml', 'tests/config_ccl_kernels.yml']):
+#for cls, config in zip([n5k.N5KCalculatorBase, n5k.N5KCalculatorCCL, n5k.N5KCalculatorCCL, n5k.N5KCalculatorMATTER], ['tests/config.yml', 'tests/config.yml', 'tests/config_ccl_kernels.yml', 'tests/config_matter.yml']):
+for cls, config in zip([n5k.N5KCalculatorMATTER], ['tests/config_matter.yml']):
     time_run(cls, config)
