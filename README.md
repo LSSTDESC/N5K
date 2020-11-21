@@ -31,7 +31,7 @@ If you choose to use given dN/dz's instead of the precomputed full kernels, it i
 
 ## Deadline
 
-The challenge will close on January 15, 2020.
+The challenge will close on January 15, 2021.
 
 ## FAQ
 
