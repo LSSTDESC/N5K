@@ -1,0 +1,10 @@
+name: levin_n5k_env
+dependencies:
+  - python=3
+  - future
+  - pyyaml
+  - numpy
+  - pip>=20.0
+  - gsl
+  - pip:
+    - "git+ssh://git@github.com/rreischke/nonLimber.git@python#egg=levinpower"
