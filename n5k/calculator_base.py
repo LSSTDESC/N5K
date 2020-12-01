@@ -23,6 +23,9 @@ class N5KCalculatorBase(object):
     def get_pk(self):
         return np.load('input/pk.npz')
 
+    def get_background(self):
+        return np.load('input/background.npz')
+
     def get_cosmological_parameters(self):
         return {'Omega_m': 0.3156,
                 'Omega_b': 0.0492,
