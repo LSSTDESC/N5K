@@ -1,2 +1,3 @@
 from .calculator_base import N5KCalculatorBase
 from .calculator_ccl import N5KCalculatorCCL
+from .calculator_ccl_nl import N5KCalculatorCCLNonLimber

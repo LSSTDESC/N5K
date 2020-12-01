@@ -1,0 +1,4 @@
+output_prefix: tests/test_nl
+tracers_from_kernels: True
+dchi: 5.
+l_nonlimber: 100
