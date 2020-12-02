@@ -62,12 +62,15 @@ class N5KCalculatorCCL(N5KCalculatorBase):
         self.cls_ss = []
         for i1, t1 in enumerate(self.t_g):
             for t2 in self.t_g[i1:]:
-                self.cls_gg.append(ccl.angular_cl(self.cosmo, t1, t2, ls))
+                self.cls_gg.append(ccl.angular_cl(self.cosmo, t1, t2, ls,
+                                                  limber_integration_method='spline'))
             for t2 in self.t_s:
-                self.cls_gs.append(ccl.angular_cl(self.cosmo, t1, t2, ls))
+                self.cls_gs.append(ccl.angular_cl(self.cosmo, t1, t2, ls,
+                                                  limber_integration_method='spline'))
         for i1, t1 in enumerate(self.t_s):
             for t2 in self.t_s[i1:]:
-                self.cls_ss.append(ccl.angular_cl(self.cosmo, t1, t2, ls))
+                self.cls_ss.append(ccl.angular_cl(self.cosmo, t1, t2, ls,
+                                                  limber_integration_method='spline'))
         self.cls_gg = np.array(self.cls_gg)
         self.cls_gs = np.array(self.cls_gs)
         self.cls_ss = np.array(self.cls_ss)

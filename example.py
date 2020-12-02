@@ -2,11 +2,19 @@ import numpy as np
 import time
 import n5k
 
+c = n5k.N5KCalculatorCCLNonLimber('tests/config_ccl_nonlimber.yml')
+c.setup()
+c.run()
+c.write_output()
+c.teardown()
+exit(1)
 
+print([c.__name__ for c in n5k.N5KCalculatorBase.__subclasses__()])
+print(n5k.N5KCalculatorCCL.__subclasses__())
 # The evaluation of challenge entries will also include accuracy and
 # integratbility - this script is just to show an example of timing
 # an entry.
-
+exit(1)
 def time_run(cls, config):
     c = cls(config)
     c.setup()

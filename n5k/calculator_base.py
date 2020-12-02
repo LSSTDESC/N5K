@@ -54,6 +54,9 @@ class N5KCalculatorBase(object):
     def get_ells(self):
         return np.unique(np.geomspace(2, 2000, 128).astype(int)).astype(float)
 
+    def get_dlog_ell(self):
+        return np.log(2000/2)/128
+
     def get_num_cls(self):
         ngg = (self.nb_g * (self.nb_g + 1)) // 2
         nss = (self.nb_s * (self.nb_s + 1)) // 2
