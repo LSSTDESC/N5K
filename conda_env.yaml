@@ -7,4 +7,4 @@ dependencies:
   - pip>=20.0
   - gsl
   - pip:
-    - "git+ssh://git@github.com/rreischke/nonLimber.git@python#egg=levinpower"
+    - "git+ssh://git@github.com/rreischke/nonLimber.git@n5k#egg=levinpower"
