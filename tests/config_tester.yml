@@ -1,0 +1,3 @@
+output_prefix: tests/tester
+benchmark_prefix: tests/benchmarks
+tracers_from_kernels: True
