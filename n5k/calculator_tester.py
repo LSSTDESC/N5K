@@ -136,4 +136,7 @@ class N5KCalculatorTester(N5KCalculatorBase):
         self.cls_mat = self._cls_to_matrix(self.cls_gg,
                                            self.cls_gs,
                                            self.cls_ss)
-        self.cls_imat = np.linalg.inv(self.cls_mat)
+        nl_cl, nl_sh = self.get_noise_biases()
+        nls_mat = np.diag(np.concatenate((nl_cl, nl_sh)))
+        self.cls_mat_wn = self.cls_mat + nls_mat[None, :, :]
+        self.cls_imat = np.linalg.inv(self.cls_mat_wn)
