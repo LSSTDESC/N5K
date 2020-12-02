@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import pyccl as ccl
 from .calculator_base import N5KCalculatorBase
 from .utils import n5k_calculator_from_name
 
@@ -49,7 +48,7 @@ class N5KCalculatorTester(N5KCalculatorBase):
             i1, i2 = self.indices_gg[i]
             cls_mat[:, i1, i2] = cl
             if i1 != i2:
-                cls_mat[:, i2, i1] = cl 
+                cls_mat[:, i2, i1] = cl
         for i, cl in enumerate(cls_gs):
             i1, i2 = self.indices_gs[i]
             cls_mat[:, i1, i2+10] = cl
@@ -82,7 +81,8 @@ class N5KCalculatorTester(N5KCalculatorBase):
         # sqrt(Sum_ell of the above)
         sn = np.sqrt(np.sum(nmodes * fisher_l))
         # Save power spectra
-        np.savez(self.config['output_prefix'] + '_comp_' + calculator_name + '.npz',
+        np.savez(self.config['output_prefix'] + '_comp_' +
+                 calculator_name + '.npz',
                  ls=self.ls, cl_gg_bm=self.cls_gg,
                  cl_gs_bm=self.cls_gs, cl_ss_bm=self.cls_ss,
                  cl_gg=cls_gg, cl_gs=cls_gs, cl_ss=cls_ss, sn=sn,
