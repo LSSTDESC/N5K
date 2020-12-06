@@ -22,7 +22,9 @@ ext_modules = [
         # Example: passing in the version to the compiled code
         define_macros = [('VERSION_INFO', __version__)],
         # This might need to be modified for other things
-        include_dirs=["/usr/include/boost"]
+        include_dirs=["/usr/include/boost"],
+        extra_compile_args=["-fopenmp"],
+        extra_link_args=["-fopenmp"],
         ),
 ]
 
