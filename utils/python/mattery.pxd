@@ -58,6 +58,8 @@ cdef extern from "matter.h":
         double* exp_integrated_tw_sampling
         double* tw_max
         double* tw_min
+        double* fft_real
+        double* fft_imag
         int l_lss_max
         double bias
         int ptw_size
@@ -74,6 +76,7 @@ cdef extern from "matter.h":
         int uses_limber_approximation
         int t_size
         double tau0
+        int uses_bessel_store
         
         
         ErrorMsg error_message

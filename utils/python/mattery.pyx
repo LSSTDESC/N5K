@@ -59,6 +59,8 @@ cdef class Matter:
     """
     from matter import Matter
     """
+    cpdef fft_real
+    cpdef fft_imag
     cdef matters ma
     cpdef int computable
 
@@ -82,7 +84,7 @@ cdef class Matter:
         self.ma.uses_intxi_logarithmic = True
         self.ma.matter_verbose = ma_verbose
 
-    def set(self,chi,kfac,pk,growth,lmax=50):
+    def set(self,chi,kfac,pk,growth,lmax=50,**kwargs):
         """
         """
         chi_ni,chi_i = chi
@@ -93,22 +95,61 @@ cdef class Matter:
         kfac_g,kfac_s = kfac
         a_pk,tau_pk, k_pk, pk = pk
 
-        self.ma.size_fft_input = len(k_pk)
-        self.ma.size_fft_cutoff = 100
-        assert(self.ma.size_fft_cutoff < self.ma.size_fft_input)
-        self.ma.tw_size = nchi_ni
-        self.ma.integrated_tw_size = nchi_i
+
+        self.ma.has_cls = True
+        self.ma.l_lss_max = lmax
+
+        self.ma.has_unintegrated_windows = 1
+        self.ma.has_integrated_windows = 1
+        self.ma.uses_limber_approximation = 0
+        self.ma.radtp_size_total = 2
+
+
         self.ma.tau0 = 14000.
+        self.ma.size_fft_cutoff = 100
+        self.ma.tw_size = 50#25
+        self.ma.integrated_tw_size = 150#75
+        self.ma.t_size = 250
+        self.ma.uses_separability = 1
+        self.ma.bias = 1.9
+        self.ma.l_logstep = 1.5#1.12
+        self.ma.l_linstep = 80#40
+        self.ma.uses_bessel_store = 1
+        for param in kwargs:
+          if param == "size_fft_cutoff":
+            self.ma.size_fft_cutoff = kwargs[param]
+          elif param == "tau0":
+            self.ma.tau0 = kwargs[param]
+          elif param == "tw_size":
+            self.ma.tw_size = kwargs[param]
+          elif param == "integrated_tw_size":
+            self.ma.integrated_tw_size = kwargs[param]
+          elif param == "t_size":
+            self.ma.t_size = kwargs[param]
+          elif param == "uses_separability":
+            self.ma.uses_separability = kwargs[param]
+          elif param == "bias":
+            self.ma.bias = kwargs[param]
+          elif param == "l_logstep":
+            self.ma.l_logstep = kwargs[param]
+          elif param == "l_linstep":
+            self.ma.l_linstep = kwargs[param]
+          elif param == "uses_bessel_store":
+            self.ma.uses_bessel_store = kwargs[param]
+          else:
+            print("Unrecognized parameter '%s'='%s'"%(param,kwargs[param]))
+
+        self.ma.size_fft_input = len(k_pk)
+        self.ma.num_windows = max(ntr_ni,ntr_i)
+        self.ma.non_diag = self.ma.num_windows -1
+        assert(self.ma.size_fft_cutoff < self.ma.size_fft_input)
 
         print("Assinging tw sampling")
 
-        self.ma.tw_size = 25
-        self.ma.integrated_tw_size = 75
         ntw_ni = self.ma.tw_size
         ntw_i = self.ma.integrated_tw_size
         self.ma.tw_min = <double*>malloc(sizeof(double)*ntr_ni)
         self.ma.tw_max = <double*>malloc(sizeof(double)*ntr_ni)
-        self.ma.num_windows = max(ntr_ni,ntr_i)
         self.ma.tw_sampling = <double*>malloc(sizeof(double)*self.ma.num_windows*ntw_ni)
         self.ma.integrated_tw_sampling = <double*>malloc(sizeof(double)*self.ma.num_windows*ntw_i)
         self.ma.exp_integrated_tw_sampling = <double*>malloc(sizeof(double)*self.ma.num_windows*ntw_i)
@@ -116,11 +157,14 @@ cdef class Matter:
         self.ma.integrated_tw_weights = <double*>malloc(sizeof(double)*self.ma.num_windows*ntw_i)
         self.ma.ptw_sampling = <double*>malloc(sizeof(double)*self.ma.num_windows*nchi_ni)
         self.ma.ptw_integrated_sampling = <double*>malloc(sizeof(double)*self.ma.num_windows*nchi_i)
+        self.ma.ptw_size = nchi_ni
+        self.ma.ptw_integrated_size = nchi_i
+
         tw_ni = [self.ma.tau0-np.linspace(chi_ni[nwd][0],chi_ni[nwd][-1],num=ntw_ni)[::-1] for nwd in range(ntr_ni)]
         tw_i = [self.ma.tau0-np.linspace(chi_i[nwd][0],chi_i[nwd][-1],num=ntw_i)[::-1] for nwd in range(ntr_i)]
         tw_ni_weights = [self.weights(tw_ni[i]) for i in range(ntr_ni)]
         tw_i_weights = [self.weights(tw_i[i]) for i in range(ntr_i)]
-        # Can cut off the tw_i already earlier due to tilt tw^(1-nu) factor
+        # TODO :: Can cut off the tw_i already earlier due to tilt tw^(1-nu) factor
 
         for nwd in range(ntr_ni):
           for itw in range(ntw_ni):
@@ -159,25 +203,13 @@ cdef class Matter:
         for ia in range(len(a_pk)):
           self.ma.tau_sampling[ia] = self.ma.tau0-tau_pk[ia]
           for ik in range(len(k_pk)):
-            self.ma.sampled_sources[ik*len(a_pk)+ia] = pk[ia,ik]
+            self.ma.sampled_sources[ik*len(a_pk)+ia] = np.sqrt(pk[ia,ik])
         self.ma.k_sampling = <double*>malloc(sizeof(double)*len(k_pk))
         self.ma.logk_sampling = <double*>malloc(sizeof(double)*len(k_pk))
         for ik in range(len(k_pk)):
           self.ma.k_sampling[ik] = k_pk[ik]
           self.ma.logk_sampling[ik] = np.log(k_pk[ik])
         self.ma.deltalogk = self.ma.logk_sampling[len(k_pk)-1]-self.ma.logk_sampling[0]
-        self.ma.uses_separability = 1
-        self.ma.non_diag = self.ma.num_windows -1
-        self.ma.has_cls = True
-        self.ma.l_lss_max = lmax
-        self.ma.bias = 1.9
-        self.ma.l_logstep = 1.12
-        self.ma.l_linstep = 40
-        self.ma.has_unintegrated_windows = 1
-        self.ma.has_integrated_windows = 1
-        self.ma.uses_limber_approximation = 0
-        self.ma.t_size = 250
-        self.ma.radtp_size_total = 2
         self.ma.ptw_window = <double**>malloc(sizeof(double*)*self.ma.radtp_size_total)
         for i in range(self.ma.radtp_size_total):
           size = (nchi_i if self.matter_is_integrated(i) else nchi_ni)
@@ -209,9 +241,9 @@ cdef class Matter:
         
     def matter_is_integrated(self,radtp):
       if radtp == 0:
-        return True
-      else:
         return False
+      else:
+        return True
 
     def compute(self):
         """
@@ -223,7 +255,15 @@ cdef class Matter:
         if matter_init(&(self.ma)) == _FAILURE_:
             raise CosmoComputationError(self.ma.error_message)
 
+        self.fft_real = np.empty((self.ma.size_fft_cutoff,))
+        self.fft_imag = np.empty((self.ma.size_fft_cutoff,))
+        for ifft in range(self.ma.size_fft_cutoff):
+          self.fft_real[ifft] = self.ma.fft_real[ifft]
+          self.fft_imag[ifft] = self.ma.fft_imag[ifft]
         return
+        
+    def get_fft(self):
+        return (self.fft_real,self.fft_imag)
 
     def matter_cl(self, ells, nofail=False):
         def index_symmetric_matrix(a,b,N):

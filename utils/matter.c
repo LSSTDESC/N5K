@@ -298,6 +298,8 @@ int matter_init(
   }
 
 
+  pma->fft_real = fft_coeff_real;
+  pma->fft_imag = fft_coeff_imag;
 
 
 #ifdef _OPENMP
@@ -428,8 +430,8 @@ int matter_init(
   /**
    *  - Now we can free our fft coefficients
    * */
-  free(fft_coeff_real);
-  free(fft_coeff_imag);
+  //free(fft_coeff_real);
+  //free(fft_coeff_imag);
   /* Done freeing up resources */
 
 
@@ -5862,6 +5864,10 @@ int matter_get_ttau_integrand(struct matters* pma,
     double temp_first,temp_second;
     temp_first = window0_val*window1_val;
     temp_second = exp_factor*window0_val*window2_val;
+    if(t>0.9998 && t<0.9999 && index_radtp1==0 && index_radtp2 ==0 && index_wd1 ==0 && index_wd2 == 0){
+      if(index_tw_local==0)printf("%.20e -- 1\n",t);
+      printf("%.10e %.10e %.10e %.10e\n",pma->tau0-x0,window0_val,temp_first,temp_second);
+    }
     for(index_coeff=0;index_coeff<pma->size_fft_result;++index_coeff){//was cutoff?
       integrand_real[index_coeff*pmw->tau_size+index_tw_local] = temp_first*wint_fft_real[index_tw_local][index_coeff]+temp_second*(wint_fft_real[index_tw_local+pmw->tau_size][index_coeff]*cos_val[index_coeff]-wint_fft_imag[index_tw_local+pmw->tau_size][index_coeff]*sin_val[index_coeff]);
       integrand_imag[index_coeff*pmw->tau_size+index_tw_local] = temp_first*wint_fft_imag[index_tw_local][index_coeff]+temp_second*(wint_fft_imag[index_tw_local+pmw->tau_size][index_coeff]*cos_val[index_coeff]+wint_fft_real[index_tw_local+pmw->tau_size][index_coeff]*sin_val[index_coeff]);
@@ -5869,6 +5875,13 @@ int matter_get_ttau_integrand(struct matters* pma,
     //End coeff
   }
   //End tw
+  if(t>0.9998 && t<0.9999 && index_radtp1==0 && index_radtp2 ==0 && index_wd1 ==0 && index_wd2 == 0){
+    printf("%.20e -- 2\n",t);
+    printf("%.10e\n",wint_fft_real[0][0]);
+    for(int i=0;i<pmw->tau_size;++i){
+      printf("%.10e %.10e \n",pma->tau0-pmw->tau_sampling[i],integrand_real[i]);
+    }
+  }
   free(cos_val);
   free(sin_val);
   return _SUCCESS_;
@@ -7502,7 +7515,14 @@ int matter_read_bessel_file_correct(struct matters* pma,short* is_correct_file){
    * Check if file is readable at all (exists)
    * */
   f_read = 0;
+#ifdef BESSEL_DIR
+  char temp[100];
+  sprintf(pma->bessel_file_name,BESSEL_DIR);
+  sprintf(temp,"/bessel_%i_%i_%i_%i.bin",pma->tilt_grid_size,pma->size_fft_result,pma->l_size_recursion,pma->bessel_recursion_t_size);
+  strcat(pma->bessel_file_name,temp);
+#else
   sprintf(pma->bessel_file_name,"output/bessel_%i_%i_%i_%i.bin",pma->tilt_grid_size,pma->size_fft_result,pma->l_size_recursion,pma->bessel_recursion_t_size);
+#endif
   read_file = fopen(pma->bessel_file_name,"rb");
   if(!read_file){*is_correct_file=_FALSE_;return _SUCCESS_;}
 

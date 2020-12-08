@@ -272,6 +272,8 @@ struct matters{
   
   /* ******************************************* */
   double* sampled_sources;
+  double* fft_real;
+  double* fft_imag;
   
   
   
@@ -755,14 +757,14 @@ extern "C" {
 #define MATTER_REWRITE_PRINTING _FALSE_
 
 #define MATTER_VERBOSITY_TIMING 1
-#define MATTER_VERBOSITY_INDICES 5
+#define MATTER_VERBOSITY_INDICES 2
 #define MATTER_VERBOSITY_FUNCTIONS 3
 #define MATTER_VERBOSITY_PARAMETERS 2
 #define MATTER_VERBOSITY_RANGES 5
 #define MATTER_VERBOSITY_BESSEL 5
 #define MATTER_VERBOSITY_CLCALCULATION 4
 #define MATTER_VERBOSITY_CLCALCULATION_PARTIAL 5
-#define MATTER_VERBOSITY_CLRESULTS 2
+#define MATTER_VERBOSITY_CLRESULTS 4
 #define MATTER_VERBOSITY_DELETE 5
 
 #define matter_is_index(index_from,index_to,condition)              \

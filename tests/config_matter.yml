@@ -1,2 +1,2 @@
 output_prefix: tests/matter
-tracers_from_kernels: False
+tracers_from_kernels: True
