@@ -44,3 +44,16 @@ We request that all non-DESC entrants agree to abide by the [DESC Code of Conduc
 **What is the accuracy level I should be aiming for?**
 
 The required accuracy level will be calculated as that which introduces a spurious <img src="https://render.githubusercontent.com/render/math?math=\chi^2"> which is less than 1 for an LSST Y10 3x2pt analysis as defined in the SRD, computed using a Gaussian covariance matrix. The precise tolerable error for a representative set of <img src="https://render.githubusercontent.com/render/math?math=\ell"> will be posted before the challenge deadline for comparison but is not yet available.
+
+**Can I precompute some stuff and put that calculation in my `setup()` method?**
+
+The thing we care about is how long it takes at each step in a sampling process. So you should put in your `run()` method anything that would need to be rerun at each step in e.g. an MCMC chain. Precomputations which are independent of the parameters that would get varied in that process can go in `setup()`.
+
+**How many cores will the calculation be run on for timing?**
+
+The thing we care about is being able to do this calculation at each step in a parameter inference sampling process. This usually means a single core for a single theory calculation, of which the Non-Limber integration forms one step. So assume a single core.
+
+**Can I assume the availability of GPUs?**
+
+If you can convince us that your GPU method can be easily integrated with the rest of the DESC parameter inference pipeline and can be run on GPU resources that DESC will definitely have access to, go for it. Otherwise, no.
+
