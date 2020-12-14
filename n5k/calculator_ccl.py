@@ -28,9 +28,9 @@ class N5KCalculatorCCL(N5KCalculatorBase):
             ker = self.get_tracer_kernels()
             a_g = 1./(1+ker['z_cl'][::-1])
             self.t_g = []
-            for k, b in zip(ker['kernels_cl'], tpar['b_g']):
+            for k in ker['kernels_cl']:
                 t = ccl.Tracer()
-                barr = np.full(len(a_g), b)
+                barr = np.ones_like(a_g)
                 t.add_tracer(self.cosmo,
                              (ker['chi_cl'], k),
                              transfer_a=(a_g, barr))
