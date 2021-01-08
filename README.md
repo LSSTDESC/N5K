@@ -31,7 +31,10 @@ If you choose to use given dN/dz's instead of the precomputed full kernels, it i
 
 ## Deadline
 
-The challenge will close on January 15, 2021.
+To enter, you must have made a draft entry pull request on this repository by **January 15, 2021** (17:00 PST). 
+
+You will then have one week to finalise your entry. Final updates to entry pull requests must be made by **January 22, 2021** (17:00 PST).
+
 
 ## FAQ
 
