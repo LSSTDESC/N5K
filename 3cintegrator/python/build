@@ -1,0 +1,50 @@
+#!/bin/sh -f
+
+#set -x
+
+#swig_exe=/usr/local/SWIG/3.0.2/bin/swig
+#swig_exe=/usr/local/SWIG/4.0.2/bin/swig
+swig_exe=/usr/bin/swig
+
+
+${swig_exe} -interface Angpow_swig_py -python -c++ -o ./Angpow_swig_py.icc ./Angpow.i
+
+#Python_home=/opt/local/Library/Frameworks/Python.framework/Versions/2.7
+#Python_inc="-I${Python_home}/include/python2.7"
+#Python_lib="-L${Python_home}/lib -lpython2.7"
+#py_exe="${Python_home}/bin/python"
+
+#Python_home=/opt/local/Library/Frameworks/Python.framework/Versions/3.6
+#Python_inc="-I${Python_home}/include/python3.6m"
+#Python_lib="-L${Python_home}/lib -lpython3.6"
+#py_exe="${Python_home}/bin/python3.6"
+
+Python_home=/sps/lsst/users/campagne/anaconda3
+Python_inc="-I${Python_home}/include/python3.7m"
+Python_lib="-L${Python_home}/lib -lpython3.7m"
+py_exe="${Python_home}/bin/python3.7"
+
+
+#Python_home=/opt/local/Library/Frameworks/Python.framework/Versions/3.8
+#Python_inc="-I${Python_home}/include/python3.8"
+#Python_lib="-L${Python_home}/lib -lpython3.8"
+#py_exe="${Python_home}/bin/python3.8"
+
+echo "py_exe:"
+echo "${py_exe}"
+
+#Python_home=/usr
+#Python_inc="-I${Python_home}/include/python2.7"
+#Python_lib="/usr/lib64/libpython2.7.so"
+#cppflags="-fopenmp"
+#libs="-fopenmp"
+
+#-fopenmp
+cppflags="${Python_inc} -I/opt/local/include -I.."
+libs="${libs} ${Python_lib} -L/opt/local/lib -lfftw3"
+
+g++ -DLinux -Wall -Wpointer-arith -O3 -fPIC -std=c++11 -fopenmp  -fno-common  -Wall -march=native -ffast-math -m64  -c ${cppflags} -o ../Objs/Angpow_swig_py.o Angpow_swig_py.cc
+
+/bin/mkdir -p ../lib
+
+g++ -Wall -Wpointer-arith -O3 -fPIC -std=c++11 -fopenmp  -fno-common  -Wall -march=native -ffast-math -m64 -shared -o ../lib/Angpow_swig_py.so ../Objs/Angpow_swig_py.o ../Objs/walltimer.o ../Objs/walltime_c.o ${libs}

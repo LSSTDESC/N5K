@@ -1,0 +1,15 @@
+
+  You have to customize the bash build script to change the swig binary binary path
+ along the Python include and library paths.
+
+  About Python, you have to take care to use the Python binary program of the version
+ used to compile and link the Angpow_swig_lib.so plugin.
+
+  sh> make
+  sh> cd python
+  sh> <If necessary, edit ./build to customize swig and Python accesses>
+  sh> ./build
+
+Go to the testwrap directory and follow README
+
+
