@@ -5,8 +5,8 @@ import os
 
 
 # First, generate benchmarks if you haven't done so yet.
-if not os.path.isfile("tests/benchmarks_clgg.npz"):
-    cal_nl = n5k.N5KCalculatorCCLNonLimber("tests/config_ccl_nonlimber.yml")
+if not os.path.isfile("tests/benchmarks_nl_clgg.npz"):
+    cal_nl = n5k.N5KCalculatorCCLNonLimber("tests/config_nl.yml")
     cal_nl.setup()
     cal_nl.run()
     cal_nl.write_output()
@@ -27,4 +27,7 @@ cal_test.setup()
 # Compute non-Limber S/N and plots
 sn = cal_test.compare('CCL', 'tests/config_ccl_limber.yml',
                       plot_stuff=True)
-print(sn)
+print("Total S/N wrt benchmarks: ", sn)
+print("Plots saved in " +
+      cal_test.config['output_prefix'] +
+      'clcomp*')
