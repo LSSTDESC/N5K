@@ -14,9 +14,7 @@ def time_run(cls, config):
 
 for cls, config in zip([n5k.N5KCalculatorBase,
                         n5k.N5KCalculatorCCL,
-                        n5k.N5KCalculatorCCL,
-                        n5k.N5KCalculatorCCLNonLimber],
+                        n5k.N5KCalculatorCCL],
                        ['tests/config.yml', 'tests/config.yml',
-                        'tests/config_ccl_kernels.yml',
-                        'tests/config_ccl_nonlimber.yml']):
+                        'tests/config_ccl_kernels.yml']):
     time_run(cls, config)
