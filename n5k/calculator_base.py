@@ -51,11 +51,36 @@ class N5KCalculatorBase(object):
         return {'z_sh': z_sh, 'dNdz_sh': dNdz_sh,
                 'z_cl': z_cl, 'dNdz_cl': dNdz_cl}
 
+    def get_noise_biases(self):
+        from scipy.integrate import simps
+
+        # Lens sample: 40 gals/arcmin^2
+        ndens_c = 40.
+        # Source sample: 27 gals/arcmin^2
+        ndens_s = 27.
+        # Ellipticity scatter per component
+        e_rms = 0.28
+
+        ndic = self.get_tracer_dndzs()
+        nc_ints = np.array([simps(n, x=ndic['z_cl'])
+                            for n in ndic['dNdz_cl'].T])
+        ns_ints = np.array([simps(n, x=ndic['z_sh'])
+                            for n in ndic['dNdz_sh'].T])
+        nc_ints *= ndens_c / np.sum(nc_ints)
+        ns_ints *= ndens_s / np.sum(ns_ints)
+        tosrad = (180*60/np.pi)**2
+        nl_cl = 1./(nc_ints*tosrad)
+        nl_sh = e_rms**2/(ns_ints*tosrad)
+        return nl_cl, nl_sh
+
     def get_tracer_kernels(self):
         return np.load("input/kernels.npz")
 
     def get_ells(self):
         return np.unique(np.geomspace(2, 2000, 128).astype(int)).astype(float)
+
+    def get_dlog_ell(self):
+        return np.log(2000/2)/128
 
     def get_num_cls(self):
         ngg = (self.nb_g * (self.nb_g + 1)) // 2
