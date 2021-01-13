@@ -467,10 +467,6 @@ extern "C" {
   int matter_obtain_bessel_integrals(
                   struct matters * pma
                   );
-  int matter_obtain_perturbation_sources(
-                  struct matters * pma,
-                  double ** sources
-                  );
   int matter_obtain_primordial_spectrum(
                   struct matters* pma,
                   double ** prim_spec

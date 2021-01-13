@@ -175,6 +175,8 @@ int matter_init(
 
   pma->size_fft_result = pma->size_fft_cutoff;
   pma->bi_maximal_t_offset = 1.e-7;
+  
+  pma->tau_grid_size = pma->tau_size*pma->tau_size;
 
   //Offset for keeping numerical instabilities for
   //log(x) small for x->0 (e.g. exp(log(x1)-log(x2) ) = 0 for x1 approx = 0, not NaN
@@ -4181,216 +4183,39 @@ int matter_obtain_nonseparability(
                               ){
   if(pma->matter_verbose>MATTER_VERBOSITY_FUNCTIONS){
     printf("Method :: Obtain non-scale-invariance factor\n");
-  } //TODO :: fix this function
+  }
   double* fft_coeff_factor_real;
   double* fft_coeff_factor_imag;
   double* fft_coeff_real = *fft_real;
   double* fft_coeff_imag = *fft_imag;
   int index_tau1,index_tau2,index_tau1_tau2,index_coeff;
-  {
-    {
-      {
-        {
-          class_alloc(fft_coeff_factor_real,
-                pma->size_fft_input*(pma->tau_grid_size+1)*sizeof(double),
-                pma->error_message);
-          class_alloc(fft_coeff_factor_imag,
-                pma->size_fft_input*(pma->tau_grid_size+1)*sizeof(double),
-                pma->error_message);
-          for(index_tau1=0;index_tau1<pma->tau_size;++index_tau1){
-            for(index_tau2=0;index_tau2<pma->tau_size;++index_tau2){
-              index_tau1_tau2 = index_tau2*pma->tau_size+index_tau1;
-              for(index_coeff = 0; index_coeff < pma->size_fft_result;++index_coeff){
-                fft_coeff_factor_real[index_tau1_tau2*pma->size_fft_input+index_coeff] =
-                  fft_coeff_real[index_tau1_tau2*pma->size_fft_input+index_coeff]/
-                  (pma->growth_factor_tau[index_tau1]*pma->growth_factor_tau[index_tau2]);
-                fft_coeff_factor_imag[index_tau1_tau2*pma->size_fft_input+index_coeff] =
-                  fft_coeff_imag[index_tau1_tau2*pma->size_fft_input+index_coeff]/
-                  (pma->growth_factor_tau[index_tau1]*pma->growth_factor_tau[index_tau2]);
-              }
-              //End index_coeff
-            }
-            //End tau 1
-          }
-          //End tau 2
-          free(fft_coeff_real);
-          free(fft_coeff_imag);
-          fft_coeff_real = fft_coeff_factor_real;
-          fft_coeff_imag = fft_coeff_factor_imag;
-          fft_real = &fft_coeff_real;
-          fft_imag = &fft_coeff_imag;
-        }
-        //End stp2
+  class_alloc(fft_coeff_factor_real,
+        pma->size_fft_input*(pma->tau_grid_size+1)*sizeof(double),
+        pma->error_message);
+  class_alloc(fft_coeff_factor_imag,
+        pma->size_fft_input*(pma->tau_grid_size+1)*sizeof(double),
+        pma->error_message);
+  for(index_tau1=0;index_tau1<pma->tau_size;++index_tau1){
+    for(index_tau2=0;index_tau2<pma->tau_size;++index_tau2){
+      index_tau1_tau2 = index_tau2*pma->tau_size+index_tau1;
+      for(index_coeff = 0; index_coeff < pma->size_fft_result;++index_coeff){
+        fft_coeff_factor_real[index_tau1_tau2*pma->size_fft_input+index_coeff] =
+          fft_coeff_real[index_tau1_tau2*pma->size_fft_input+index_coeff]/
+          (pma->growth_factor_tau[index_tau1]*pma->growth_factor_tau[index_tau2]);
+        fft_coeff_factor_imag[index_tau1_tau2*pma->size_fft_input+index_coeff] =
+          fft_coeff_imag[index_tau1_tau2*pma->size_fft_input+index_coeff]/
+          (pma->growth_factor_tau[index_tau1]*pma->growth_factor_tau[index_tau2]);
       }
-      //End stp1
+      //End index_coeff
     }
-    //End ic2
+    //End tau 1
   }
-  //End ic1
-  //free(fft_coeff_factor_real);
-  //free(fft_coeff_factor_imag);
-  return _SUCCESS_;
-}
-
-
-/**
- * Obtain the desired sources
- *
- * @param pma                  Input: pointer to matter struct
- * @param source               Input: array of source functions
- * @return the error status
- */
-int matter_obtain_perturbation_sources(
-                                      struct matters * pma,
-                                      double ** sources
-                                      ) {
-  if(pma->matter_verbose > MATTER_VERBOSITY_FUNCTIONS){
-    printf("Method :: Obtain perturbation sources\n");
-  }
-  /**
-   * Define indices to use
-   * */
-  int index_ic;
-  int index_tp;
-  int index_stp;
-  int index_k;
-  int index_tau_matter;
-  int index_tau_perturbs;
-  int last_index_tau;
-  double tau_beginning;
-  double tau_fraction;
-  int index_md = 0;
-
-  /**
-   * Allocate temporary source arrays used for splining
-   * */
-  double * source_temp;
-  double * ddsource_temp;
-  class_alloc(source_temp,
-              pma->tau_size*pma->k_size*sizeof(double),
-              pma->error_message);
-  class_alloc(ddsource_temp,
-              pma->tau_size*pma->k_size*sizeof(double),
-              pma->error_message);
-  if(pma->matter_verbose > MATTER_VERBOSITY_RANGES){
-    printf(" -> Allocated perturbation sources with size %i*%i = %i \n",pma->ic_ic_size,pma->stp_size,pma->ic_size*pma->stp_size);
-  }
-  for (index_ic = 0; index_ic < pma->ic_size; index_ic++) {
-    for (index_stp = 0; index_stp < pma->stp_size; index_stp++) {
-      index_tp = pma->index_perturb_tp_of_stp[index_stp];
-      class_alloc(sources[index_ic * pma->stp_size + index_stp],
-                  pma->k_size*pma->tau_size*sizeof(double),
-                  pma->error_message);
-      /**
-       * If we want to use nonlinear spectra,
-       *  we need to respect those when copying the sources
-       * */
-      if (_TRUE_) {
-        for(index_tau_perturbs=0;index_tau_perturbs<pma->tau_size;++index_tau_perturbs){
-          for (index_k=0; index_k<pma->k_size_file; index_k++) {
-            if(pma->has_ncdm){
-              //Here we trust nonlinear to set index_pk_cb correctly
-              source_temp[index_k*pma->tau_size+index_tau_perturbs] =
-              pma->sources[index_md][index_ic * pma->tp_size[index_md] + index_tp]
-                [index_tau_perturbs * pma->k_size_file + index_k]
-              * pma->nl_corr_density[pma->index_pk_cb][index_tau_perturbs * pma->k_size_file + index_k];
-            }
-            else{
-              source_temp[index_k*pma->tau_size+index_tau_perturbs] =
-              pma->sources[index_md][index_ic * pma->tp_size[index_md] + index_tp]
-                [index_tau_perturbs * pma->k_size_file + index_k]
-              * pma->nl_corr_density[pma->index_pk_m][index_tau_perturbs * pma->k_size_file + index_k];
-            }
-          }
-          //End k
-        }
-        //End tau perturbs
-      }
-      /**
-       * Otherwise, we simply copy the perturbation sources
-       * */
-      else {
-        for(index_tau_perturbs=0;index_tau_perturbs<pma->tau_size;++index_tau_perturbs){
-          for (index_k=0; index_k<pma->k_size_file; index_k++) {
-            source_temp[index_k*pma->tau_size+index_tau_perturbs] =
-            pma->sources[index_md][index_ic * pma->tp_size[index_md] + index_tp]
-              [index_tau_perturbs * pma->k_size_file + index_k];
-          }
-          //End k
-        }
-        //End tau perturbs
-      }
-      //Ifend nonlinear check
-
-      /**
-       * We want to work with the sources
-       *  phi k^2 and psi k^2, not with the original sources
-       * This allows us to use the same bias for all sources,
-       *  which simplifies a lot of things
-       * */
-      if(
-          matter_is_index(index_stp, pma->stp_index_phi_plus_psi, pma->has_stp_phi_plus_psi)
-          ||
-          matter_is_index(index_stp,pma->stp_index_phi,pma->has_gravitational_terms)
-          ||
-          matter_is_index(index_stp,pma->stp_index_phi_plus_psi,pma->has_gravitational_terms)
-          ||
-          matter_is_index(index_stp,pma->stp_index_phi_prime,pma->has_gravitational_terms)
-          ||
-          matter_is_index(index_stp,pma->stp_index_psi,pma->has_gravitational_terms)
-        ){
-        for(index_k=0;index_k<pma->k_size_file;++index_k){
-          for(index_tau_perturbs=0;index_tau_perturbs<pma->tau_size;++index_tau_perturbs){
-            source_temp[index_k*pma->tau_size+index_tau_perturbs] *= pma->k_file[index_k]*pma->k_file[index_k];
-          }
-        }
-      }
-      /**
-       * Now we spline all sources so we can interpolate them at any k we want
-       * */
-      class_call(array_spline_table_columns(
-                                 pma->tau_sampling,
-                                 pma->tau_size,
-                                 source_temp,
-                                 pma->k_size_file,
-                                 ddsource_temp,
-                                 _SPLINE_EST_DERIV_,
-                                 pma->error_message
-                                ),
-                 pma->error_message,
-                 pma->error_message);
-      /**
-       * Now we spline the sources for every tau we need to know them on
-       * */
-      for(index_tau_matter=0;index_tau_matter<pma->tau_size;++index_tau_matter){
-        /**
-         * This is a rough estimation of the index in the tau array of the perturbation structure
-         * */
-        tau_beginning = pma->tau_sampling[pma->index_tau_perturbs_beginning];
-        tau_fraction = (log(pma->tau_sampling[index_tau_matter])-log(tau_beginning))/(log(pma->tau0)-log(tau_beginning));
-        last_index_tau = pma->index_tau_perturbs_beginning+(pma->tau_size-1-pma->index_tau_perturbs_beginning)*tau_fraction;
-
-        class_call(matter_interpolate_spline_growing_hunt(
-                                               pma->tau_sampling,
-                                               pma->tau_size,
-                                               source_temp,
-                                               ddsource_temp,
-                                               pma->k_size,
-                                               pma->tau_sampling[index_tau_matter],
-                                               &last_index_tau,
-                                               sources[index_ic*pma->stp_size+index_stp]+index_tau_matter*pma->k_size,
-                                               pma->error_message
-                                               ),
-                   pma->error_message,
-                   pma->error_message);
-      }
-      //End tau matter
-    }
-    //End stp
-  }
-  //End ic
-  free(source_temp);
-  free(ddsource_temp);
+  //End tau 2
+  free(fft_coeff_real);
+  free(fft_coeff_imag);
+  printf("%.10e %.10e \n",fft_coeff_factor_real[230],fft_coeff_factor_imag[230]);
+  *fft_real = fft_coeff_factor_real;
+  *fft_imag = fft_coeff_factor_imag;
   return _SUCCESS_;
 }
 
@@ -5867,10 +5692,6 @@ int matter_get_ttau_integrand(struct matters* pma,
     double temp_first,temp_second;
     temp_first = window0_val*window1_val;
     temp_second = exp_factor*window0_val*window2_val;
-    if(t>0.9998 && t<0.9999 && index_radtp1==0 && index_radtp2 ==0 && index_wd1 ==0 && index_wd2 == 0){
-      if(index_tw_local==0)printf("%.20e -- 1\n",t);
-      printf("%.10e %.10e %.10e %.10e\n",pma->tau0-x0,window0_val,temp_first,temp_second);
-    }
     for(index_coeff=0;index_coeff<pma->size_fft_result;++index_coeff){//was cutoff?
       integrand_real[index_coeff*pmw->tau_size+index_tw_local] = temp_first*wint_fft_real[index_tw_local][index_coeff]+temp_second*(wint_fft_real[index_tw_local+pmw->tau_size][index_coeff]*cos_val[index_coeff]-wint_fft_imag[index_tw_local+pmw->tau_size][index_coeff]*sin_val[index_coeff]);
       integrand_imag[index_coeff*pmw->tau_size+index_tw_local] = temp_first*wint_fft_imag[index_tw_local][index_coeff]+temp_second*(wint_fft_imag[index_tw_local+pmw->tau_size][index_coeff]*cos_val[index_coeff]+wint_fft_real[index_tw_local+pmw->tau_size][index_coeff]*sin_val[index_coeff]);
@@ -5878,13 +5699,6 @@ int matter_get_ttau_integrand(struct matters* pma,
     //End coeff
   }
   //End tw
-  if(t>0.9998 && t<0.9999 && index_radtp1==0 && index_radtp2 ==0 && index_wd1 ==0 && index_wd2 == 0){
-    printf("%.20e -- 2\n",t);
-    printf("%.10e\n",wint_fft_real[0][0]);
-    for(int i=0;i<pmw->tau_size;++i){
-      printf("%.10e %.10e \n",pma->tau0-pmw->tau_sampling[i],integrand_real[i]);
-    }
-  }
   free(cos_val);
   free(sin_val);
   return _SUCCESS_;
