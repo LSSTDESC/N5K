@@ -19,9 +19,14 @@ OMPFLAG   = -fopenmp
 #OMPFLAG   = -mp -mp=nonuma -mp=allcores -g
 #OMPFLAG   = -openmp
 
+
 # all other compilation flags
 CCFLAG = -g -fPIC
 LDFLAG = -g -fPIC
+
+# output directory to store the bessel files in
+BESSEL_DIR := ${CURDIR}
+CCFLAG += -DBESSEL_DIR='"$(BESSEL_DIR)"'
 
 all: matter libmatter.a matterlib
 

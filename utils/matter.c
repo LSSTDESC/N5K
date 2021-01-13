@@ -261,7 +261,6 @@ int matter_init(
   /* Done getting and splining growth factor */
 
 
-
 #ifdef _OPENMP
   double point3_time = omp_get_wtime();
 #endif
@@ -290,8 +289,8 @@ int matter_init(
      * */
     class_call(matter_obtain_nonseparability(
                                           pma,
-                                          fft_coeff_real,
-                                          fft_coeff_imag),
+                                          &fft_coeff_real,
+                                          &fft_coeff_imag),
                pma->error_message,
                pma->error_message);
 
@@ -4177,14 +4176,16 @@ int matter_obtain_relative_factor(
  */
 int matter_obtain_nonseparability(
                                struct matters* pma,
-                               double * fft_coeff_real,
-                               double * fft_coeff_imag
+                               double ** fft_real,
+                               double ** fft_imag
                               ){
   if(pma->matter_verbose>MATTER_VERBOSITY_FUNCTIONS){
     printf("Method :: Obtain non-scale-invariance factor\n");
-  }
+  } //TODO :: fix this function
   double* fft_coeff_factor_real;
   double* fft_coeff_factor_imag;
+  double* fft_coeff_real = *fft_real;
+  double* fft_coeff_imag = *fft_imag;
   int index_tau1,index_tau2,index_tau1_tau2,index_coeff;
   {
     {
@@ -4216,6 +4217,8 @@ int matter_obtain_nonseparability(
           free(fft_coeff_imag);
           fft_coeff_real = fft_coeff_factor_real;
           fft_coeff_imag = fft_coeff_factor_imag;
+          fft_real = &fft_coeff_real;
+          fft_imag = &fft_coeff_imag;
         }
         //End stp2
       }

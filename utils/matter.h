@@ -507,8 +507,8 @@ extern "C" {
                   );
   int matter_obtain_nonseparability(
                   struct matters* pma,
-                  double * fft_coeff_real,
-                  double * fft_coeff_imag
+                  double ** fft_coeff_real,
+                  double ** fft_coeff_imag
                   );
   int matter_spline_cls(
                   struct matters* pma
