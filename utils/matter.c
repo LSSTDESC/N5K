@@ -4213,7 +4213,6 @@ int matter_obtain_nonseparability(
   //End tau 2
   free(fft_coeff_real);
   free(fft_coeff_imag);
-  printf("%.10e %.10e \n",fft_coeff_factor_real[230],fft_coeff_factor_imag[230]);
   *fft_real = fft_coeff_factor_real;
   *fft_imag = fft_coeff_factor_imag;
   return _SUCCESS_;
