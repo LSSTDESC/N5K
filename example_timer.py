@@ -10,7 +10,7 @@ def time_run(cls, config):
     tf = time.time()
     c.write_output()
     c.teardown()
-    print(f'{cls.name}: t={tf-t0}s')
+    print('{cls.name}: t={tf-t0}s')
 
 for cls, config in zip([n5k.N5KCalculatorBase,
                         n5k.N5KCalculatorCCL,

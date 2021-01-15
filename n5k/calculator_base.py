@@ -18,7 +18,7 @@ class N5KCalculatorBase(object):
     def _check_config_sanity(self):
         for name in self.needed_fields:
             if not self.config.get(name):
-                raise ValueError(f"You must provide {name}")
+                raise ValueError("You must provide {name}")
 
     def get_pk(self):
         return np.load('input/pk.npz')

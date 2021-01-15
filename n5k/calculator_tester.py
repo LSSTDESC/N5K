@@ -44,6 +44,8 @@ class N5KCalculatorTester(N5KCalculatorBase):
     def _cls_to_matrix(self, cls_gg, cls_gs, cls_ss):
         # Get C_ell matrix
         cls_mat = np.zeros([len(self.ls), 15, 15])
+        # cls_gs =[]
+        # cls_ss =[]
         for i, cl in enumerate(cls_gg):
             i1, i2 = self.indices_gg[i]
             cls_mat[:, i1, i2] = cl
@@ -67,6 +69,10 @@ class N5KCalculatorTester(N5KCalculatorBase):
         cls_gg = cal.cls_gg.copy()
         cls_gs = cal.cls_gs.copy()
         cls_ss = cal.cls_ss.copy()
+
+        # cls_gs = []
+        # cls_ss = []
+
         cal.teardown()
 
         # Compute chi2 of the difference
@@ -93,6 +99,8 @@ class N5KCalculatorTester(N5KCalculatorBase):
             def plot_cls(fname, cl1, cl2, el):
                 plt.figure()
                 plt.plot(self.ls, (cl1-cl2)/el)
+                # plt.plot(self.ls, cl1)
+                # plt.plot(self.ls, cl2)
                 plt.xlabel(r'$\ell$', fontsize=16)
                 plt.ylabel(r'$\Delta C_\ell/\sigma(C_\ell)$', fontsize=16)
                 plt.xscale('log')
