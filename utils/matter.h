@@ -193,8 +193,9 @@ struct matters{
    * */
 
   double small_log_offset;
-  int num_windows;
+  int num_windows;           // Maximum number of windows over all Cl types
   int num_window_grid;
+  int* num_windows_per_cltp; // Number of windows for each Cl type
   int tw_size; //Length in steps of tau-indices of the window
   double* tw_sampling; //[index_wd*tw_size+index_tw]The tau values sampled for the windows
   double* tw_weights; //Trapezoidal weights for tau window integration

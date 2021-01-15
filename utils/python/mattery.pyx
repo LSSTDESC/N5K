@@ -142,6 +142,9 @@ cdef class Matter:
         self.ma.size_fft_input = len(k_pk)
         self.ma.num_windows = max(ntr_ni,ntr_i)
         self.ma.non_diag = self.ma.num_windows -1
+        self.ma.num_windows_per_cltp = <int*>malloc(sizeof(int)*2) # 2 cltypes (nonint, int)
+        self.ma.num_windows_per_cltp[0] = ntr_ni
+        self.ma.num_windows_per_cltp[1] = ntr_i
         assert(self.ma.size_fft_cutoff < self.ma.size_fft_input)
 
         print("Assinging tw sampling")

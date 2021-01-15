@@ -23,7 +23,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
                                                  pk_array=dpk['pk_lin'][::-1][:])
         self.cosmo._set_nonlin_power_from_arrays(a_array=a,
                                                  k_array=dpk['k'],
-                                                 pk_array=dpk['pk_lin'][::-1][:])#dpk['pk_nl'][::-1][:])
+                                                 pk_array=dpk['pk_nl'][::-1][:])
         # Initialize tracers
         if self.config.get('tracers_from_kernels', False):
             tpar = self.get_tracer_parameters()
@@ -101,10 +101,11 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
           kern = self.t_s[i].get_kernel(self.chi_integrated[i])
           trans = self.t_s[i].get_transfer(0.,ccl.scale_factor_of_chi(self.cosmo,self.chi_integrated[i]))
           for itr in range(1):#range(kern.shape[0]):
-            self.kerfac_s[i] += kern[itr]*trans[itr]
-        
+            self.kerfac_s[i] += kern[itr]*trans[itr]/self.chi_integrated[i]**2
+            self.kerfac_s[i][0]=0
+
         # Shorthand notations:
-        power = dpk['pk_lin'][::-1]
+        power = dpk['pk_nl'][::-1]
         Na_pk = len(power)
 
         # 4) Get the growth factor and pass it as well (sampled on same scale factor grid as the P(k))
@@ -145,7 +146,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         stw = 50#25 (faster, but more inaccurate)
         sitw = 75
         self.ma.set((self.chi_nonintegrated,self.chi_integrated),(self.kerfac_g,self.kerfac_s),(self.a_pk,self.tau_pk,self.k_pk,self.deltaksq),self.growth,lmax=2000,size_fft_cutoff=sfftcutoff,tw_size=stw,integrated_tw_size=sitw,
-        uses_separability=True)
+        uses_separability=False)
 
     def run(self):
         # Compute power spectra

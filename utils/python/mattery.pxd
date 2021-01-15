@@ -48,6 +48,7 @@ cdef extern from "matter.h":
         double* tau_sampling
         int has_cls
         int num_windows
+        int* num_windows_per_cltp
         int non_diag
         int tw_size
         int integrated_tw_size

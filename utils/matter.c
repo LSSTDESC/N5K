@@ -3246,10 +3246,10 @@ int matter_obtain_bi_indices(
    * */
   // Normal bessel functions
   class_define_index(pma->bitp_index_normal, pma->has_bitp_normal,bi_size_counter,           1);
-  class_define_index(pma->tilt_index_normal, pma->has_bitp_normal,tilt_size_counter,         1);
+  class_define_index(pma->tilt_index_normal, pma->has_tilt_normal,tilt_size_counter,         1);
   // Nu-2 and Nu-4 bessel functions
   class_define_index(pma->bitp_index_nu_reduced, pma->has_bitp_nu_reduced ,bi_size_counter,  1);
-  class_define_index(pma->tilt_index_reduced, pma->has_bitp_nu_reduced || pma->has_bitp_lfactor,tilt_size_counter,    1);
+  class_define_index(pma->tilt_index_reduced, pma->has_tilt_reduced,tilt_size_counter,    1);
   // l(l+1) prefactor of bessel functions
   // (does not introduce new tilt)
   class_define_index(pma->bitp_index_lfactor, pma->has_bitp_lfactor,bi_size_counter,         1);
@@ -4869,7 +4869,7 @@ int matter_integrate_cl(struct matters* pma,
                       pma->window_size[index_cltp1_cltp2]*pma->l_size*sizeof(double),
                       pma->error_message);
           int win_counter = 0;
-          for(index_wd1=0;index_wd1<pma->num_windows;++index_wd1){
+          for(index_wd1=0;index_wd1<pma->num_windows_per_cltp[index_cltp1];++index_wd1){ //[NS]: modified for DESC
             for(index_wd2=pma->window_index_start[index_cltp1_cltp2][index_wd1];index_wd2<=pma->window_index_end[index_cltp1_cltp2][index_wd1];++index_wd2){
               index_wd1_wd2 = index_symmetric_matrix(index_wd1,index_wd2,pma->num_windows);
               if(pma->matter_verbose > MATTER_VERBOSITY_CLCALCULATION){
@@ -4929,7 +4929,7 @@ int matter_integrate_cl(struct matters* pma,
         printf(" -> At cltp (%4d,%4d) \n",index_cltp1,index_cltp2);
         {
           index_wd1_wd2=0;
-          for(index_wd1=0;index_wd1<pma->num_windows;++index_wd1){
+          for(index_wd1=0;index_wd1<pma->num_windows_per_cltp[index_cltp1];++index_wd1){
             for(index_wd2=pma->window_index_start[index_cltp1_cltp2][index_wd1];index_wd2<=pma->window_index_end[index_cltp1_cltp2][index_wd1];++index_wd2){
               printf(" -> At win (%4d,%4d) ... \n",index_wd1,index_wd2);
               printf("%.10e",
@@ -4969,7 +4969,7 @@ int matter_integrate_cl(struct matters* pma,
         printf(" -> At cltp (%4d,%4d) \n",index_cltp1,index_cltp2);
         {
           index_wd1_wd2=0;
-          for(index_wd1=0;index_wd1<pma->num_windows;++index_wd1){
+          for(index_wd1=0;index_wd1<pma->num_windows_per_cltp[index_cltp1];++index_wd1){
             for(index_wd2=pma->window_index_start[index_cltp1_cltp2][index_wd1];index_wd2<=pma->window_index_end[index_cltp1_cltp2][index_wd1];++index_wd2){
               printf(" -> At win (%4d,%4d) ... \n",index_wd1,index_wd2);
               printf("%.10e",
@@ -7408,17 +7408,20 @@ int matter_obtain_window_indices(struct matters* pma){
                   pma->num_windows*sizeof(int),
                   pma->error_message);
       if(index_cltp1==index_cltp2){
-        pma->window_size[index_cltp1_cltp2]=pma->num_window_grid-x_grid;
+      //[NS]: All below is modified for DESC
+        pma->window_size[index_cltp1_cltp2]=(pma->num_windows_per_cltp[index_cltp1]*(pma->num_windows_per_cltp[index_cltp1]+1))/2; //pma->num_window_grid-x_grid;
+        printf("Window size = %i => %i\n",pma->num_windows_per_cltp[index_cltp1],pma->window_size[index_cltp1_cltp2]);
         for(index_wd1=0;index_wd1<pma->num_windows;++index_wd1){
           pma->window_index_start[index_cltp1_cltp2][index_wd1]=index_wd1;
-          pma->window_index_end[index_cltp1_cltp2][index_wd1]=MIN(index_wd1+pma->non_diag,pma->num_windows-1);
+          pma->window_index_end[index_cltp1_cltp2][index_wd1]=pma->num_windows_per_cltp[index_cltp1]-1;//MIN(index_wd1+pma->non_diag,pma->num_windows-1);
         }
       }
       else{
-        pma->window_size[index_cltp1_cltp2]=pma->num_windows*pma->num_windows-2*x_grid;
+        pma->window_size[index_cltp1_cltp2]=pma->num_windows_per_cltp[index_cltp1]*pma->num_windows_per_cltp[index_cltp2];//pma->num_windows*pma->num_windows-2*x_grid;
+        printf("Window size = %i , %i => %i\n",pma->num_windows_per_cltp[index_cltp1],pma->num_windows_per_cltp[index_cltp2],pma->window_size[index_cltp1_cltp2]);
         for(index_wd1=0;index_wd1<pma->num_windows;++index_wd1){
-          pma->window_index_start[index_cltp1_cltp2][index_wd1]=MAX(0,index_wd1-pma->non_diag);
-          pma->window_index_end[index_cltp1_cltp2][index_wd1]=MIN(index_wd1+pma->non_diag,pma->num_windows-1);
+          pma->window_index_start[index_cltp1_cltp2][index_wd1]=0;//MAX(0,index_wd1-pma->non_diag);
+          pma->window_index_end[index_cltp1_cltp2][index_wd1]=pma->num_windows_per_cltp[index_cltp2]-1;//MIN(index_wd1+pma->non_diag,pma->num_windows-1);
         }
       }
     }
