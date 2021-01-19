@@ -6389,10 +6389,10 @@ int matter_integrate_each(struct matters* pma,
               sum_t*=(y_max-y_min);
             }
             if(pma->has_bitp_lfactor && index_bitp2 == pma->bitp_index_lfactor){
-              sum_t*=pma->l_sampling[index_l]*(pma->l_sampling[index_l]+1.0);
+              sum_t*=sqrt((pma->l_sampling[index_l]-1.0)*pma->l_sampling[index_l]*(pma->l_sampling[index_l]+1.0)*(pma->l_sampling[index_l]+2.0));
             }
             if(pma->has_bitp_lfactor && index_bitp1 == pma->bitp_index_lfactor){
-              sum_t*=pma->l_sampling[index_l]*(pma->l_sampling[index_l]+1.0);
+              sum_t*=sqrt((pma->l_sampling[index_l]-1.0)*pma->l_sampling[index_l]*(pma->l_sampling[index_l]+1.0)*(pma->l_sampling[index_l]+2.0));
             }
             if(type_doubling == _TRUE_){sum_t*=2.;}
             sum_l[index_l] += sum_t;

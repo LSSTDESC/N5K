@@ -45,6 +45,8 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
                              der_bessel=-1, der_angles=2)
                 self.t_s.append(t)
         else:
+            print("NOT PROPERLY IMPLEMENTED YET!")
+            quit()
             nzs = self.get_tracer_dndzs()
             tpar = self.get_tracer_parameters()
             z_g = nzs['z_cl']
@@ -101,8 +103,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
           kern = self.t_s[i].get_kernel(self.chi_integrated[i])
           trans = self.t_s[i].get_transfer(0.,ccl.scale_factor_of_chi(self.cosmo,self.chi_integrated[i]))
           for itr in range(1):#range(kern.shape[0]):
-            self.kerfac_s[i] += kern[itr]*trans[itr]/self.chi_integrated[i]**2
-            self.kerfac_s[i][0]=0
+            self.kerfac_s[i][1:] += (kern[itr]*trans[itr]/self.chi_integrated[i]**2)[1:] # Ill defined for the 0th index, keep it to be 0
 
         # Shorthand notations:
         power = dpk['pk_nl'][::-1]

@@ -168,10 +168,20 @@ cdef class Matter:
 
         tw_ni = [self.ma.tau0-np.linspace(chi_ni[nwd][0],chi_ni[nwd][-1],num=ntw_ni)[::-1] for nwd in range(ntr_ni)]
         tw_i = [self.ma.tau0-np.linspace(chi_i[nwd][0],chi_i[nwd][-1],num=ntw_i)[::-1] for nwd in range(ntr_i)]
+        logtw_i = [np.linspace(np.log(chi_i[nwd][0]+1e-10),np.log(chi_i[nwd][-1]),num=ntw_i) for nwd in range(ntr_i)]
         tw_ni_weights = [self.weights(tw_ni[i]) for i in range(ntr_ni)]
         tw_i_weights = [self.weights(tw_i[i]) for i in range(ntr_i)]
+        logtw_i_weights = [self.weights(logtw_i[i]) for i in range(ntr_i)]
         # TODO :: Can cut off the tw_i already earlier due to tilt tw^(1-nu) factor
 
+        xmin = 1e-10
+        uses_lensing_reduction = False
+        if uses_lensing_reduction:
+          nu_reduction = 0.5*self.ma.bias-3
+          window_epsilon = 1e-6
+          chimax = chi_i[nwd][-1]
+          chi_epsilon = (0.5*chimax)*pow(window_epsilon,-1./nu_reduction)
+          xmin = max(chi_epsilon,1e-10);
         for nwd in range(ntr_ni):
           for itw in range(ntw_ni):
             self.ma.tw_sampling[nwd*ntw_ni+itw] = tw_ni[nwd][itw]
@@ -181,9 +191,9 @@ cdef class Matter:
         for nwd in range(ntr_i):
           for itw in range(ntw_i):
             if self.ma.uses_intxi_logarithmic:
-                self.ma.exp_integrated_tw_sampling[nwd*ntw_i+itw] = self.ma.tau0-tw_i[nwd][itw]
-                self.ma.integrated_tw_sampling[nwd*ntw_i+itw] = np.log(self.ma.tau0-tw_i[nwd][itw]+1.0e-5) ## TODO :: remove this factor
-                self.ma.integrated_tw_weights[nwd*ntw_i+itw] = tw_i_weights[nwd][itw]
+                self.ma.exp_integrated_tw_sampling[nwd*ntw_i+itw] = np.exp(logtw_i[nwd][itw])#self.ma.tau0-tw_i[nwd][itw]
+                self.ma.integrated_tw_sampling[nwd*ntw_i+itw] = logtw_i[nwd][itw] #np.log(self.ma.tau0-tw_i[nwd][itw]+1.0e-5) ## TODO :: remove this factor
+                self.ma.integrated_tw_weights[nwd*ntw_i+itw] = logtw_i_weights[nwd][itw]
             else:
                 self.ma.integrated_tw_sampling[nwd*ntw_i+itw] = tw_i[nwd][itw]
                 self.ma.integrated_tw_weights[nwd*ntw_i+itw] = tw_i_weights[nwd][itw]
