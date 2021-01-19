@@ -76,6 +76,7 @@ cdef extern from "matter.h":
         int has_integrated_windows
         int uses_limber_approximation
         int t_size
+        int t_spline_size
         double tau0
         int uses_bessel_store
         

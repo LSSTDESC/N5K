@@ -81,7 +81,7 @@ cdef class Matter:
         """
         """
         self.computable = False
-        self.ma.uses_intxi_logarithmic = True
+        self.ma.uses_intxi_logarithmic = 1
         self.ma.matter_verbose = ma_verbose
 
     def set(self,chi,kfac,pk,growth,lmax=50,**kwargs):
@@ -109,7 +109,8 @@ cdef class Matter:
         self.ma.size_fft_cutoff = 100
         self.ma.tw_size = 50#25
         self.ma.integrated_tw_size = 150#75
-        self.ma.t_size = 250
+        self.ma.t_size = 250 #150 in the file
+        self.ma.t_spline_size = 60
         self.ma.uses_separability = 1
         self.ma.bias = 1.9
         self.ma.l_logstep = 1.5#1.12
@@ -126,6 +127,8 @@ cdef class Matter:
             self.ma.integrated_tw_size = kwargs[param]
           elif param == "t_size":
             self.ma.t_size = kwargs[param]
+          elif param == "t_spline_size":
+            self.ma.t_spline_size = kwargs[param]
           elif param == "uses_separability":
             self.ma.uses_separability = kwargs[param]
           elif param == "bias":

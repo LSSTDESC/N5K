@@ -148,6 +148,10 @@ int matter_init(
 
   pma->uses_integration = matter_integrate_tw_t;
 
+  pma->uses_intxi_symmetrized = _TRUE_;
+  pma->uses_intxi_asymptotic = _FALSE_;
+  pma->uses_intxi_interpolation = _TRUE_;
+
   /**
    *  - Obtain indices required for later evaluation
    * */
