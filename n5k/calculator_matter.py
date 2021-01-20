@@ -13,20 +13,21 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
 
     def setup(self):
         # RELEVANT PRECISION PARAMTERS
-        verbosity = 1
-        sfftcutoff = 60#50 (faster, but more inaccurate)
-        stw = 40#25 (faster, but more inaccurate)
-        sitw = 75
-        st = 150
-        st_spline = 60
-        l_logstep = 1.4
-        l_linstep = 75
-        lmax = 2000
-        seperability = False
-        kmin = 1e-7
-        self.Nk_fft = 256
-        Nchi_nonintegrated = 800
-        Nchi_integrated = 1600
+        verbosity = self.config['verbosity']
+        sfftcutoff = self.config['size_FFTlog']
+        stw = self.config['size_chi_window_array']
+        sitw = self.config['size_chi_window_array_integrated']
+        st = self.config['size_prep_t_array']
+        st_spline = self.config['size_t_array']
+        l_logstep = self.config['l_logstep']
+        l_linstep = self.config['l_linstep']
+        lmax = self.config['lmax']
+        seperability = self.config['seperable']
+        kmin = float(self.config['k_min'])
+        self.Nk_fft = self.config['size_prep_FFTlog']
+        Nchi_nonintegrated = self.config['size_prep_chi_window_array']
+        Nchi_integrated = self.config['size_prep_chi_window_array_integrated']
+
         # INITIALIZE COSMOLOGY
         par = self.get_cosmological_parameters()
         self.cosmo = ccl.Cosmology(Omega_c=par['Omega_m']-par['Omega_b'],
