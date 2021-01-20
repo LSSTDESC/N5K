@@ -1,6 +1,6 @@
-/** @file Temporary addition file for new transfer functionality
+/** @file New way of calculating angular power spectra
  *
- * Nils Schöneberg, 18.10.2017
+ * Nils Schöneberg, 18.10.2017 (edited for DESC until 20.01.2021)
  *
  */
 #ifndef __MATTER__
@@ -450,12 +450,6 @@ extern "C" {
   int matter_free(
                   struct matters * pma
                   );
-  int matter_free_prepare_window(
-                  struct matters* pma
-                  );
-  int matter_obtain_k_sampling(
-                  struct matters* pma
-                  );
   int matter_obtain_l_sampling(
                   struct matters * pma
                   );
@@ -464,27 +458,6 @@ extern "C" {
                   );
   int matter_obtain_coeff_sampling(
                   struct matters * pma
-                  );
-  int matter_obtain_bessel_integrals(
-                  struct matters * pma
-                  );
-  int matter_obtain_primordial_spectrum(
-                  struct matters* pma,
-                  double ** prim_spec
-                  );
-  int matter_obtain_growth_factor(
-                  struct matters* pma,
-                  double ** sources,
-                  double * k_weights
-                  );
-  int matter_obtain_relative_factor(
-                  struct matters* pma,
-                  double ** sources,
-                  double * k_weights
-                  );
-  int matter_obtain_growth_factor_k_weights(
-                  struct matters* pma,
-                  double * k_weights
                   );
   int matter_get_prepared_window_at(
                   struct matters* pma,
@@ -499,9 +472,6 @@ extern "C" {
   int matter_obtain_bi_indices(
                   struct matters* pma
                   );
-  int matter_spline_growth_factor(
-                  struct matters* pma
-                  );
   int matter_obtain_nonseparability(
                   struct matters* pma,
                   double ** fft_coeff_real,
@@ -510,37 +480,6 @@ extern "C" {
   int matter_spline_cls(
                   struct matters* pma
                   );
-  int matter_free_perturbation_sources(
-                  struct matters * pma,
-                  double ** sources
-                  );
-  int matter_free_primordial(
-                  struct matters * pma,
-                  double ** prim_spec
-                  );
-  int matter_free_fft(
-                  struct matters * pma,
-                  double * fft_real,
-                  double * fft_imag
-                  );
-  int matter_FFTlog_perturbation_sources(
-                  struct matters * pma,
-                  double * fft_coeff_real,
-                  double * fft_coeff_imag
-                  );
-  int matter_sample_sources(
-                  struct matters* pma,
-                  double** source,
-                  double** sampled_source,
-                  double* perturbed_k_sampling
-                  );
-  int matter_extrapolate_sources(
-                  struct matters* pma,
-                  double** k_extrapolated,
-                  double** sources,
-                  double** extrapolated_sources,
-                  short extrapolation_type
-                  );
   int matter_integrate_cl(
                   struct matters* pma,
                   double * fft_coeff_real,
@@ -548,23 +487,6 @@ extern "C" {
                   );
   int matter_spline_bessel_integrals_recursion(
                   struct matters * pma
-                  );
-  int matter_spline_bessel_integrals(
-                  struct matters * pma
-                  );
-  int matter_integrate_window_function(
-                  struct matters* pma,
-                  double* window,
-                  double* integrated_window,
-                  double* integrated_sampling,
-                  double* oldtw_sampling,
-                  double* oldtw_weights,
-                  int integrated_size,
-                  int oldtw_size,
-                  int index_wd,
-                  int radtp,
-                  double* f_evo,
-                  double* pvecback
                   );
   int matter_interpolate_spline_growing_hunt(
                   double * x_array,
@@ -577,54 +499,12 @@ extern "C" {
                   double * result,
                   ErrorMsg errmsg
                   );
-  int matter_estimate_t_max_bessel(
-                  struct matters * pma,
-                  double l,
-                  double nu_imag,
-                  double* t_max_estimate
-                  );
-  int matter_window_function(
-                  struct matters* pma,
-                  int bin,
-                  double z,
-                  double * selection);
-  int matter_dNdz_analytic(
-                  struct matters * pma,
-                  double z,
-                  double * dNdz,
-                  double * dln_dNdz_dz);
-  int array_integrate_gauss(
-                  double* xarray,
-                  double* warray,
-                  int N,
-                  short gauss_type,
-                  ErrorMsg err_msg
-                  );
-  int array_integrate_gauss_limits(
-                  double* xarray,
-                  double* warray,
-                  double xmin,
-                  double xmax,
-                  int N,
-                  short gauss_type,
-                  ErrorMsg err_msg
-                  );
-  int matter_derive(
-                  double* x_array,
-                  double* array,
-                  int x_length,
-                  double* dx_array,
-                  ErrorMsg errmsg
-                  );
   int matter_spline_prepare_hunt(
                   double* x_array,
                   int x_size,
                   double x,
                   int* last,
                   ErrorMsg errmsg
-                  );
-  int matter_resample_growth_factor(
-                  struct matters * pma
                   );
   int matter_cl_at_l(
                   struct matters* pma,
@@ -679,8 +559,6 @@ extern "C" {
                   int index_l,
                   struct matters_workspace* pmw
                   );
-  int matter_obtain_time_sampling(
-                  struct matters* pma);
   int matter_integrate_cosmo(
                   struct matters* pma,
                   struct matters_workspace* pmw
@@ -693,7 +571,6 @@ extern "C" {
                   int index_l,
                   struct matters_workspace* pmw
                   );
-  int array_integrate_gauss_rescale_limits(double* xarray,double* warray,double* xarrayres,double* warrayres,double xmin,double xmax,int N);
   int matter_get_half_integrand(
                   struct matters* pma,
                   double t,
@@ -725,9 +602,6 @@ extern "C" {
                   double** wint_fft_real,
                   double** wint_fft_imag,
                   struct matters_workspace* pmw
-                  );
-  int matter_obtain_prepare_windows_parallel(
-                  struct matters* pma
                   );
   int matter_FFTlog_perturbation_sources_parallel(
                   struct matters * pma,
