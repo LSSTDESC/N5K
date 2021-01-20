@@ -1,0 +1,34 @@
+A few notes about this submission:
+
+You can compile the program by typing
+
+cd utils
+make clean
+make -j
+cd ..
+
+Then, you can run the calculator_matter.py as you would run any other calculator
+(e.g. from the example.py file)
+
+Inside of the file "n5k/calculator_matter.py" are a few precision parameters, namely
+        verbosity = 1
+        sfftcutoff = 60#50 (faster, but more inaccurate)
+        stw = 40#25 (faster, but more inaccurate)
+        sitw = 75
+        st = 150
+        st_spline = 60
+        l_logstep = 1.4
+        l_linstep = 75
+        lmax = 2000
+        seperability = False
+        kmin = 1e-7
+        self.Nk_fft = 256
+        Nchi_nonintegrated = 800
+        Nchi_integrated = 1600
+For a given accuracy setting, these can be optimized to get good precision, but still good speed.
+The most important ones are the different sizes (stw, sitw, st, st_spline), which make the program faster if they are smaller
+Furthermore, important are the FFT coefficient orders Nk_fft (which should be fine), and sfft_cutoff, which is very important for speed, and if it's too low, it will create "wiggles" in the error residuals, but it will increase the speed
+The 'separability' should remain 'False' for non-linear power spectra, but can be set true for linear P(k,z)
+Parameters that are less relevant are Nchi_nonintegrated, Nchi_integrated, kmin, lmax
+Finally, for the l array that is used internally, it goes from logarithmic steps for small l to linear steps for large l
+The corresponding stepsizes are l_logstep and l_linstep
