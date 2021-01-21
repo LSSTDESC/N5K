@@ -1,5 +1,7 @@
 # N5K: Non-local No-Nonsense Non-Limber Numerical Knockout
 
+**Deadline extension:** To allow time to properly address some recently flagged issues with the accuracy benchmarks, we are extending the final challenge deadline to **February 5th, 2021**.
+
 In this challenge, you are asked to compute a set of power spectra for a 3x2pt (cosmic shear, galaxy-galaxy lensing, and galaxy clustering) analysis without the use of the Limber approximation.
 
 The challenge entries will be evaluated on the basis of accuracy, speed, and integrability with the [Core Cosmology Library](https://github.com/LSSTDESC/CCL/) (CCL). CCL is python (with some heavy-lifting done in C under the hood); a code which is in python or has a python wrapper will satisfy the integrability criteria. Given this, the code which can accomplish the challenge task fastest and within the accuracy requirements of an LSST Y10 cosmological analysis will win the challenge. The winning code will be incorporated for use as the non-Limber integration tool for CCL.
@@ -38,7 +40,7 @@ If you choose to use given dN/dz's instead of the precomputed full kernels, it i
 
 To enter, you must have made a draft entry pull request on this repository by **January 15, 2021** (17:00 PST). 
 
-You will then have one week to finalise your entry. Final updates to entry pull requests must be made by **January 22, 2021** (17:00 PST).
+You will then have time to finalise your entry. Final updates to entry pull requests must be made by **February 5th, 2021** (17:00 PST) (extended from January 22nd, 2021).
 
 
 ## FAQ
