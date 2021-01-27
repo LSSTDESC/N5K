@@ -71,7 +71,7 @@ class N5KCalculatorTester(N5KCalculatorBase):
 
         # Compute chi2 of the difference
         cls_test = self._cls_to_matrix(cls_gg, cls_gs, cls_ss)
-        nmodes = self.fsky*self.get_nmodes()*0.5
+        nmodes = self.fsky*self.get_nmodes_fullsky()
         dcl = cls_test-self.cls_mat
 
         # DC_l * C_l^{-1}
