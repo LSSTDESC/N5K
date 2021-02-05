@@ -1,4 +1,5 @@
 # Ignore emacs backup files
 *~
+*.png
 
 n5k/__pycache__/

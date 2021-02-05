@@ -38,9 +38,15 @@ Sh_tracers = [ccl.WeakLensingTracer(cosmo, (z_sh, dndzs['dNdz_sh'][:, ni]),
                                     True)
               for ni in range(0, 5)]
 
+
+def bias(i):
+    return np.full(len(z_cl), tpar['b_g'][i])
+
+
 chi_sh = ccl.comoving_radial_distance(cosmo, 1./(1.+z_sh))
 chi_cl = ccl.comoving_radial_distance(cosmo, 1./(1.+z_cl))
-kernels_cl = np.array([t.get_kernel(chi_cl)[0] for t in Cl_tracers])
+kernels_cl = np.array([t.get_kernel(chi_cl)[0]*bias(i)
+                       for i, t in enumerate(Cl_tracers)])
 kernels_sh = np.array([t.get_kernel(chi_sh)[0] for t in Sh_tracers])
 np.savez('input/kernels.npz',
          z_cl=z_cl, chi_cl=chi_cl, kernels_cl=kernels_cl,
