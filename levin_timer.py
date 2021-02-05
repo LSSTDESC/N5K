@@ -16,7 +16,8 @@ def time_run(cls, config):
 
 for cls, config in zip([n5k.N5KCalculatorBase,
                         n5k.N5KCalculatorCCL,
+                        n5k.calculator_levin.N5KCalculatorLevin,
                         n5k.calculator_levin.N5KCalculatorLevin],
                        ['tests/config.yml', 'tests/config_ccl_kernels.yml',
-                        'tests/config_levin.yml']):
+                        'tests/config_levin.yml', 'tests/config_levin_precompute.yml']):
     time_run(cls, config)

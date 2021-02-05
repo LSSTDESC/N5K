@@ -1,3 +1,3 @@
 output_prefix: tests/levin
 tracers_from_kernels: True
-precompute_splines: False
+precompute_splines: True

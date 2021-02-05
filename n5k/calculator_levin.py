@@ -16,7 +16,11 @@ class N5KCalculatorLevin(N5KCalculatorBase):
         background = self.get_background()
 
         number_count = kernels["kernels_cl"].shape[0]
-        self.levin_calculator = levinpower.LevinPower(number_count, 
+
+        precompute_splines = self.config.get('precompute_splines', False)
+        self.levin_calculator = levinpower.LevinPower(
+                          precompute_splines,
+                          number_count, 
                           background["z"], background["chi"], 
                           kernels["chi_cl"], np.concatenate((kernels["kernels_cl"].T, kernels["kernels_sh"].T), axis=1), 
                           pk["k"], pk["z"], pk["pk_lin"].flatten(), pk["pk_nl"].flatten())
