@@ -55,12 +55,12 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         ker = self.get_tracer_kernels()
         a_g = 1./(1+ker['z_cl'][::-1])
         self.t_g = []
-        for k, b in zip(ker['kernels_cl'], tpar['b_g']):
+        for k in ker['kernels_cl']:
             t = ccl.Tracer()
-            barr = np.full(len(a_g), b)
+            barr = np.ones_like(a_g)
             t.add_tracer(self.cosmo,
                          (ker['chi_cl'], k),
-                         transfer_a=(a_g, barr/barr))
+                         transfer_a=(a_g, barr))
             self.t_g.append(t)
         self.t_s = []
         for k in ker['kernels_sh']:
@@ -69,7 +69,6 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
                          kernel=(ker['chi_sh'], k),
                          der_bessel=-1, der_angles=2)
             self.t_s.append(t)
-
 
         # PREPROCESSING
         # -> Now we perform (!)preprocessing(!) steps relevant to the 'matter (FFTlog)' calculator
