@@ -60,7 +60,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
             barr = np.full(len(a_g), b)
             t.add_tracer(self.cosmo,
                          (ker['chi_cl'], k),
-                         transfer_a=(a_g, barr))
+                         transfer_a=(a_g, barr/barr))
             self.t_g.append(t)
         self.t_s = []
         for k in ker['kernels_sh']:
