@@ -36,12 +36,16 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
                                    A_s=par['A_s'], w0=par['w0'])
         dpk = self.get_pk()
         a = 1./(1+dpk['z'][::-1])
-        self.cosmo._set_linear_power_from_arrays(a_array=a,
-                                                 k_array=dpk['k'],
-                                                 pk_array=dpk['pk_lin'][::-1][:])
-        self.cosmo._set_nonlin_power_from_arrays(a_array=a,
-                                                 k_array=dpk['k'],
-                                                 pk_array=dpk['pk_nl'][::-1][:])
+        self.cosmo = ccl.CosmologyCalculator(Omega_c=par['Omega_m']-par['Omega_b'],
+                                             Omega_b=par['Omega_b'],
+                                             h=par['h'], n_s=par['n_s'],
+                                             A_s=par['A_s'], w0=par['w0'],
+                                             pk_linear={'a': a,
+                                                        'k': dpk['k'],
+                                                        'delta_matter:delta_matter': dpk['pk_lin'][::-1][:]},
+                                             pk_nonlin={'a': a,
+                                                        'k': dpk['k'],
+                                                        'delta_matter:delta_matter': dpk['pk_nl'][::-1][:]})
 
         # INITIALIZE TRACERS
         #  -> Currently, we only allow this to be done from the kernel file,
