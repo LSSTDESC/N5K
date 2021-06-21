@@ -3,16 +3,23 @@ import os.path
 import pickle
 
 from .calculator_base import N5KCalculatorBase
+from .calculator_ccl import N5KCalculatorCCL
 from scipy.special import spherical_jn
 from .bessel_tools import bessel_zeros
 from scipy.interpolate import interp1d, interp2d
 from scipy.integrate import simps
 
+# maximum l at which we are going to use non-limber
+lmax = 200
 
 class N5KCalculatorDSBT(N5KCalculatorBase):
     name = 'DSBT'
 
     def setup(self):
+
+        # We use the default CCL limber integrator
+        self.limber = N5KCalculatorCCL("tests/config_ccl_limber.yml")
+        self.limber.setup()
 
         # If transform matrix is already trained, we just load it
         if os.path.exists('cache_dsbt.npz'):
@@ -23,6 +30,10 @@ class N5KCalculatorDSBT(N5KCalculatorBase):
             # Retrieve relevant info
             pk = self.get_pk()
             ells = self.get_ells()
+
+            # Here we are 
+            ells = ells[ells<lmax]
+
             kernels = self.get_tracer_kernels()
             chi_kernel = kernels['chi_sh']
 
@@ -32,7 +43,7 @@ class N5KCalculatorDSBT(N5KCalculatorBase):
             # Ideally for the transform to work well this should be 1
             # but that's costly, so we can apply a factor that neglects small
             # scales... we won't get very accurate results at high ell
-            res_factor = 100
+            res_factor = 50
             kmax = kmax / res_factor
             # Nmax at l=0, this is conservative
             nmax = int(chi_kernel[-1] * kmax / np.pi)
@@ -73,6 +84,8 @@ class N5KCalculatorDSBT(N5KCalculatorBase):
         kernels_interp_sh = [interp1d(kernels['chi_sh'], kernels['kernels_sh'][i]/kernels['chi_sh']**2,
                       fill_value=0., bounds_error=False ) for i in range(len(kernels['kernels_sh']))]
 
+        # We first compute all the cls with non limber up to lmax
+        ells = ells[ells<lmax]
         self.cls_gg = []
         self.cls_gs = []
         self.cls_ss = []
@@ -101,3 +114,25 @@ class N5KCalculatorDSBT(N5KCalculatorBase):
         self.cls_gg = np.array(self.cls_gg)
         self.cls_gs = np.array(self.cls_gs)
         self.cls_ss = np.array(self.cls_ss)
+
+        ells = self.get_ells()
+        ells = ells[ells>=lmax]
+
+        cls_gg = []
+        cls_gs = []
+        cls_ss = []
+        for i1, t1 in enumerate(self.limber.t_g):
+            for t2 in self.limber.t_g[i1:]:
+                cls_gg.append(self.limber._get_cl(t1, t2, ells))
+            for t2 in self.limber.t_s:
+                cls_gs.append(self.limber._get_cl(t1, t2, ells))
+        for i1, t1 in enumerate(self.limber.t_s):
+            for t2 in self.limber.t_s[i1:]:
+                cls_ss.append(self.limber._get_cl(t1, t2, ells))
+        cls_gg = np.array(cls_gg)
+        cls_gs = np.array(cls_gs)
+        cls_ss = np.array(cls_ss)
+
+        self.cls_gg = np.concatenate([self.cls_gg, cls_gg], axis=-1)
+        self.cls_gs = np.concatenate([self.cls_gs, cls_gs], axis=-1)
+        self.cls_ss = np.concatenate([self.cls_ss, cls_ss], axis=-1)
