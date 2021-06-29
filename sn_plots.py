@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 if __name__ == "__main__":
-    names = ["CCL", "Levin"]
+    names = ["CCL",]
 
     for name in names:
         comp_vs_bm = np.load(f"tests/tester_comp_{name}.npz")
@@ -13,7 +13,7 @@ if __name__ == "__main__":
         plt.semilogx(ell, np.sqrt(np.cumsum(comp_vs_bm["sn_per_l"]**2)-comp_vs_bm["sn_per_l"][0]**2), label=f"Cumulative SN {name}")
 
     plt.axhline(0, c="k", lw=1)
-    
+
     plt.legend(frameon=False)
     plt.xlabel("$\\ell$")
     plt.ylabel("SN")
