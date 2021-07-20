@@ -21,7 +21,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         st_spline = self.config['size_t_array']
         l_logstep = self.config['l_logstep']
         l_linstep = self.config['l_linstep']
-        lmax = self.config['lmax']
+        self.lmax = self.config['lmax']
         seperability = self.config['seperable']
         kmin = float(self.config['k_min'])
         self.Nk_fft = self.config['size_prep_FFTlog']
@@ -86,7 +86,8 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         #  -> Note, that this step would be unnecessary, if the files would be storing
         #     only the relevant nonzero contributions
         #  -> We iterate through each window function, sample it on a very broad grid, and check what is the maximum value
-        threshold = 1e-10
+        #threshold = 1e-10
+        threshold = 1e-100
         chi_test = ker['chi_sh']
         self.chi_g_mins,self.chi_g_maxs = np.empty((2,Ntg),dtype="float64")
         self.chi_s_mins,self.chi_s_maxs = np.zeros((2,Nts),dtype="float64")
@@ -99,6 +100,8 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
            mask = tg_test>threshold*maxtg
            self.chi_g_maxs[i] = chi_test[len(mask[0])-np.argmax(mask[0][::-1])-1]
            self.chi_g_mins[i] = chi_test[np.argmax(mask[0])]
+
+        threshold = 1e-10
         for i,ts in enumerate(self.t_s):
            # Get the kernel
            ts_test = ts.get_kernel(chi_test)
@@ -109,7 +112,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
            self.chi_s_maxs[i] = chi_test[len(mask)-np.argmax(mask[::-1])-1]
            imin = np.argmax(mask)
            # If imin==0, this means that the shear window function has support up until chi=z=0
-           self.chi_s_mins[i] = (chi_test[imin] if imin>1 else 0.)
+           self.chi_s_mins[i] = 0.#(chi_test[imin] if imin>1 else 0.)
 
         # Now the minima and maxima in chi of the window functions have been found
 
@@ -126,7 +129,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         for i in range(Ntg):
           kern = self.t_g[i].get_kernel(self.chi_nonintegrated[i])
           trans = self.t_g[i].get_transfer(0.,ccl.scale_factor_of_chi(self.cosmo,self.chi_nonintegrated[i]))
-          growth_g = ccl.growth_rate(self.cosmo, ccl.scale_factor_of_chi(self.cosmo,self.chi_nonintegrated[i]))
+
           for itr in range(kern.shape[0]):
             self.kerfac_g[i] += kern[itr]*trans[itr]
         self.kerfac_s = np.zeros((Nts,Nchi_integrated))
@@ -145,7 +148,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         #      Since below we derive it entirely from the file
         #      it is data that could also be easily provided alongside it
         self.a_pk = a
-        # self.growth = ccl.growth_rate(self.cosmo, self.a_pk) <-- Actually, it turns out this is usuall not accurate enough. Instead, we replace it by pk_growth
+        #self.growth = ccl.growth_rate(self.cosmo, self.a_pk) #<-- Actually, it turns out this is usuall not accurate enough. Instead, we replace it by pk_growth
         pk_growth = np.empty((Na_pk,))
         for i in range(Na_pk):
           pk_growth[i] = np.sqrt(np.mean(power[i]/power[-1]))
@@ -161,9 +164,10 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
 
         # 7) The kmin of the provided file is a bit too high. Here we extrapolate using k^(n_s) to reach lower k values (down to kmin = 1e-7/Mpc)
         #   -> This would also not need to be done if the file was a bit more expansive in its k-range
-        Nk_small = int(np.log10(dpk['k'][0]/1e-7)/np.log10(dpk['k'][1]/dpk['k'][0])+1)
+        new_k_min = 1e-7
+        Nk_small = int(np.log10(dpk['k'][0]/new_k_min)/np.log10(dpk['k'][1]/dpk['k'][0])+1)
         assert(Nk_small > 10)
-        ksmall = np.geomspace(1e-7,dpk['k'][0],endpoint=False,num=Nk_small)
+        ksmall = np.geomspace(new_k_min,dpk['k'][0],endpoint=False,num=Nk_small)
         k_all = np.concatenate([ksmall,dpk['k']])
 
         # 8) Now we do some transformations of the P(k,z) file, getting some derived quantities
@@ -178,6 +182,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
           # Special note : we want Delta(k,z)=sqrt(P(k,z)*k^3/(2*pi^2)) instead of P(k) for the matterlib
           self.deltaksq[i] = interp(k_all,pk_all)(self.k_pk)*self.k_pk**3/(2.*np.pi**2)
 
+
         # SETTING UP THE MATTERLIB
         #  -> Finally, we can set up the python wrapper of matter.c, which is called 'matterlib'.
         # 1) Setup a matterlib object, giving it a desired verbosity
@@ -191,16 +196,19 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         #     and passing cosmology-dependent things, like the growth factor
         #  -> We took the liberty to leave it here. It takes only around 0.05 seconds, so it should be irrelevant for timing tests
         #     If you are very concerned about it, please feel free to move it into the run method
-
         self.ma.set(
           (self.chi_nonintegrated,self.chi_integrated),
           (self.kerfac_g,self.kerfac_s),(self.a_pk,self.chi_pk,self.k_pk,self.deltaksq),
           self.growth,
-          lmax=lmax, uses_separability=seperability,
+          lmax=self.lmax, uses_separability=seperability,
           size_fft_cutoff=sfftcutoff,tw_size=stw,integrated_tw_size=sitw,
           l_logstep=l_logstep, l_linstep = l_linstep,
           t_size = st, t_spline_size = st_spline
           )
+
+        all_ells = self.get_ells()
+        self.ell_matter = all_ells[all_ells<=self.lmax]
+        self.ell_limber = all_ells[all_ells>self.lmax]
 
     def run(self):
         # EXECUTE THE MATTERLIB
@@ -209,11 +217,10 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         #    but it could be optimized for some final release version
         # Compute power spectra
         self.ma.compute()
-        
+
         # GET RESULTS
         # Get the Cl's for the given l array
-        ls = self.get_ells()
-        cls = self.ma.matter_cl(ls)
+        cls_matter = self.ma.matter_cl(self.ell_matter)
 
         # Store the results in the Cl's_xy array (this is equivalent to the part in calculator_ccl.py, just with different notation)
         self.cls_gg = []
@@ -221,12 +228,18 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         self.cls_ss = []
         for i1 in range(len(self.t_g)):
           for i2 in range(i1,len(self.t_g)):
-            self.cls_gg.append(cls["dd"][(i1,i2)])
+            cls_m = cls_matter["dd"][(i1,i2)]
+            cls_l = ccl.angular_cl(self.cosmo, self.t_g[i1], self.t_g[i2], self.ell_limber, limber_integration_method='spline')
+            self.cls_gg.append(np.concatenate([cls_m,cls_l]))
           for i2 in range(len(self.t_s)):
-            self.cls_gs.append(cls["dl"][(i1,i2)])
+            cls_m = cls_matter["dl"][(i1,i2)]
+            cls_l = ccl.angular_cl(self.cosmo, self.t_g[i1], self.t_s[i2], self.ell_limber, limber_integration_method='spline')
+            self.cls_gs.append(np.concatenate([cls_m,cls_l]))
         for i1 in range(len(self.t_s)):
           for i2 in range(i1,len(self.t_s)):
-            self.cls_ss.append(cls["ll"][(i1,i2)])
+            cls_m = cls_matter["ll"][(i1,i2)]
+            cls_l = ccl.angular_cl(self.cosmo, self.t_s[i1], self.t_s[i2], self.ell_limber, limber_integration_method='spline')
+            self.cls_ss.append(np.concatenate([cls_m,cls_l]))
         self.cls_gg = np.array(self.cls_gg)
         self.cls_gs = np.array(self.cls_gs)
         self.cls_ss = np.array(self.cls_ss)
