@@ -110,6 +110,30 @@ class fftlog_fang(object):
 		Fy = irfft(np.conj(h_m)) * y**(-self.nu) * np.sqrt(np.pi)/4.
 		return y[self.N_extrap_high:self.N-self.N_extrap_low], Fy[self.N_extrap_high:self.N-self.N_extrap_low]
 
+	def fftlog_triplet(self, ell):
+		"""
+		Calculate F(y) = \int_0^\infty dx / x * f(x) * j_\ell(xy),
+		where j_\ell is the spherical Bessel func of order ell.
+		array y is set as y[:] = (ell+1)/x[::-1]
+		Also output integral for j_{\ell-2}(xy) and j_{\ell+2}(xy), but on same y grid
+		"""
+		x0 = self.x[0]
+		z_ar = self.nu + 1j*self.eta_m
+		y = (ell+1.) / self.x[::-1]
+		func_m = self.c_m * (self.x[0]*y[0])**(-1j*self.eta_m)
+		h_m = func_m * g_l(ell, z_ar)
+
+		Fy = irfft(np.conj(h_m)) * y**(-self.nu) * np.sqrt(np.pi)/4.
+		# print(self.N_extrap_high,self.N,self.N_extrap_low)
+
+		h_m_low = func_m * g_l(ell-2, z_ar)
+		Fy_low = irfft(np.conj(h_m_low)) * y**(-self.nu) * np.sqrt(np.pi)/4.
+
+		h_m_high= func_m * g_l(ell+2, z_ar)
+		Fy_high = irfft(np.conj(h_m_high)) * y**(-self.nu) * np.sqrt(np.pi)/4.
+
+		return y[self.N_extrap_high:self.N-self.N_extrap_low], Fy[self.N_extrap_high:self.N-self.N_extrap_low], Fy_low[self.N_extrap_high:self.N-self.N_extrap_low], Fy_high[self.N_extrap_high:self.N-self.N_extrap_low]
+
 
 
 class hankel(object):

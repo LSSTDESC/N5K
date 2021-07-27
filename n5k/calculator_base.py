@@ -18,7 +18,7 @@ class N5KCalculatorBase(object):
     def _check_config_sanity(self):
         for name in self.needed_fields:
             if not self.config.get(name):
-                raise ValueError("You must provide {name}")
+                raise ValueError("You must provide %s"%(name))
 
     def get_pk(self):
         return np.load('input/pk.npz')
@@ -79,8 +79,13 @@ class N5KCalculatorBase(object):
     def get_ells(self):
         return np.unique(np.geomspace(2, 2000, 128).astype(int)).astype(float)
 
-    def get_dlog_ell(self):
-        return np.log(2000/2)/128
+    def get_nmodes_fullsky(self):
+        """ Returns the number of modes in each ell bin"""
+        ls = self.get_ells()
+        nmodes = list(ls[1:]**2-ls[:-1]**2)
+        lp = ls[-1]**2/ls[-2]
+        nmodes.append(lp**2-ls[-1]**2)
+        return np.array(nmodes)*0.5
 
     def get_num_cls(self):
         ngg = (self.nb_g * (self.nb_g + 1)) // 2
