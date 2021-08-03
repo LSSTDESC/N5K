@@ -80,13 +80,41 @@ class N5KCalculatorTester(N5KCalculatorBase):
         fisher_l = np.einsum('lik,lki->l', clicl, clicl)
         # sqrt(Sum_ell of the above)
         sn = np.sqrt(np.sum(nmodes * fisher_l))
+        # Gaussian errors
+        cls_gg_err = []
+        cls_gs_err = []
+        cls_ss_err = []
+        for i, (i1, i2) in enumerate(self.indices_gg):
+            cl11 = self.cls_mat_wn[:, i1, i1]
+            cl22 = self.cls_mat_wn[:, i2, i2]
+            cl12 = self.cls_mat_wn[:, i1, i2]
+            cls_gg_err.append(np.sqrt((cl11*cl22+cl12**2)/nmodes))
+
+        for i, (i1, i2) in enumerate(self.indices_gs):
+            cl11 = self.cls_mat_wn[:, i1, i1]
+            cl22 = self.cls_mat_wn[:, i2+10, i2+10]
+            cl12 = self.cls_mat_wn[:, i1, i2+10]
+            cls_gs_err.append(np.sqrt((cl11*cl22+cl12**2)/nmodes))
+
+        for i, (i1, i2) in enumerate(self.indices_ss):
+            cl11 = self.cls_mat_wn[:, i1+10, i1+10]
+            cl22 = self.cls_mat_wn[:, i2+10, i2+10]
+            cl12 = self.cls_mat_wn[:, i1+10, i2+10]
+            cls_ss_err.append(np.sqrt((cl11*cl22+cl12**2)/nmodes))
+
+        cls_gg_err = np.array(cls_gg_err)
+        cls_gs_err = np.array(cls_gs_err)
+        cls_ss_err = np.array(cls_ss_err)
+
         # Save power spectra
         np.savez(self.config['output_prefix'] + '_comp_' +
                  calculator_name + '.npz',
                  ls=self.ls, cl_gg_bm=self.cls_gg,
                  cl_gs_bm=self.cls_gs, cl_ss_bm=self.cls_ss,
-                 cl_gg=cls_gg, cl_gs=cls_gs, cl_ss=cls_ss, sn=sn,
-                 sn_per_l=np.sqrt(fisher_l*nmodes))
+                 cl_gg=cls_gg, cl_gs=cls_gs, cl_ss=cls_ss,
+                 cl_gg_err=cls_gg_err, cl_gs_err=cls_gs_err,
+                 cl_ss_err=cls_ss_err,
+                 sn=sn, sn_per_l=np.sqrt(fisher_l*nmodes))
 
         if plot_stuff:
             # Make plots
@@ -100,31 +128,19 @@ class N5KCalculatorTester(N5KCalculatorBase):
                 plt.close()
 
             for i, (i1, i2) in enumerate(self.indices_gg):
-                cl11 = self.cls_mat[:, i1, i1]
-                cl22 = self.cls_mat[:, i2, i2]
-                cl12 = self.cls_mat[:, i1, i2]
-                # Gaussian errors
-                el = np.sqrt((cl11*cl22+cl12**2)/nmodes)
+                el = cls_gg_err[i]
                 plot_cls(self.config['output_prefix'] + 'clcomp' +
                          calculator_name + '_g%d_g%d.png' % (i1, i2),
                          self.cls_gg[i], cls_gg[i], el)
 
             for i, (i1, i2) in enumerate(self.indices_gs):
-                cl11 = self.cls_mat[:, i1, i1]
-                cl22 = self.cls_mat[:, i2+10, i2+10]
-                cl12 = self.cls_mat[:, i1, i2+10]
-                # Gaussian errors
-                el = np.sqrt((cl11*cl22+cl12**2)/nmodes)
+                el = cls_gs_err[i]
                 plot_cls(self.config['output_prefix'] + 'clcomp' +
                          calculator_name + '_g%d_s%d.png' % (i1, i2),
                          self.cls_gs[i], cls_gs[i], el)
 
             for i, (i1, i2) in enumerate(self.indices_ss):
-                cl11 = self.cls_mat[:, i1+10, i1+10]
-                cl22 = self.cls_mat[:, i2+10, i2+10]
-                cl12 = self.cls_mat[:, i1+10, i2+10]
-                # Gaussian errors
-                el = np.sqrt((cl11*cl22+cl12**2)/nmodes)
+                el = cls_ss_err[i]
                 plot_cls(self.config['output_prefix'] + 'clcomp' +
                          calculator_name + '_s%d_s%d.png' % (i1, i2),
                          self.cls_ss[i], cls_ss[i], el)
