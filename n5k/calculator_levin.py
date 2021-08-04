@@ -15,18 +15,23 @@ class N5KCalculatorLevin(N5KCalculatorBase):
         number_count = kernels["kernels_cl"].shape[0]
 
         precompute_splines = self.config.get('precompute_splines', False)
+        ell_max_non_Limber = self.config.get('ell_max_non_Limber', 95)
+        ell_max_ext_Limber = self.config.get('ell_max_ext_Limber', 1000)
+
         ell = self.get_ells().astype(int)
         self.levin_calculator = levinpower.LevinPower(
-                          precompute_splines,
                           ell,
-                          number_count, 
+                          number_count,
                           background["z"], background["chi"],
                           kernels["chi_cl"],
                           np.concatenate((kernels["kernels_cl"].T,
                                           kernels["kernels_sh"].T), axis=1),
                           pk["k"], pk["z"],
                           pk["pk_lin"].flatten(),
-                          pk["pk_nl"].flatten())
+                          pk["pk_nl"].flatten(),
+                          precompute_splines=precompute_splines,
+                          ell_max_non_Limber=ell_max_non_Limber,
+                          ell_max_ext_Limber=ell_max_ext_Limber)
 
     def run(self):
         # Compute power spectra
