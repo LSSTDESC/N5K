@@ -118,6 +118,7 @@ cdef class Matter:
         self.ma.l_logstep = 1.5#1.12
         self.ma.l_linstep = 80#40
         self.ma.uses_bessel_store = 1
+        internal_logchi_i_offset = 1e-10
         # Overwrite the parameters according to the kwargs
         for param in kwargs:
           if param == "size_fft_cutoff":
@@ -142,6 +143,8 @@ cdef class Matter:
             self.ma.l_linstep = kwargs[param]
           elif param == "uses_bessel_store":
             self.ma.uses_bessel_store = kwargs[param]
+          elif param == "internal_logchi_i_offset":
+            internal_logchi_i_offset = kwargs[param]
           else:
             print("Unrecognized parameter '%s'='%s'"%(param,kwargs[param]))
 
@@ -172,7 +175,7 @@ cdef class Matter:
         # Setting the relevant tau_window = tw samplings
         tw_ni = [self.ma.tau0-np.linspace(chi_ni[nwd][0],chi_ni[nwd][-1],num=ntw_ni)[::-1] for nwd in range(ntr_ni)]
         tw_i = [self.ma.tau0-np.linspace(chi_i[nwd][0],chi_i[nwd][-1],num=ntw_i)[::-1] for nwd in range(ntr_i)]
-        logtw_i = [np.linspace(np.log(chi_i[nwd][0]+1e-10),np.log(chi_i[nwd][-1]),num=ntw_i) for nwd in range(ntr_i)]
+        logtw_i = [np.linspace(np.log(chi_i[nwd][0]+float(internal_logchi_i_offset)),np.log(chi_i[nwd][-1]),num=ntw_i) for nwd in range(ntr_i)]
         # Setting the corresponding weights
         tw_ni_weights = [self.weights(tw_ni[i]) for i in range(ntr_ni)]
         tw_i_weights = [self.weights(tw_i[i]) for i in range(ntr_i)]

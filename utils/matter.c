@@ -150,6 +150,7 @@ int matter_init(
 
   pma->uses_intxi_symmetrized = _TRUE_;
   pma->uses_intxi_asymptotic = _FALSE_;
+  pma->uses_intxi_logarithmic = _TRUE_;
   pma->uses_intxi_interpolation = _TRUE_;
 
   /**

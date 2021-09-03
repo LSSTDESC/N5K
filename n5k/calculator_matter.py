@@ -27,6 +27,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         self.Nk_fft = self.config['size_prep_FFTlog']
         Nchi_nonintegrated = self.config['size_prep_chi_window_array']
         Nchi_integrated = self.config['size_prep_chi_window_array_integrated']
+        internal_logchi_i_offset = self.config['internal_logchi_i_offset']
 
         # INITIALIZE COSMOLOGY
         par = self.get_cosmological_parameters()
@@ -101,7 +102,6 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
            self.chi_g_maxs[i] = chi_test[len(mask[0])-np.argmax(mask[0][::-1])-1]
            self.chi_g_mins[i] = chi_test[np.argmax(mask[0])]
 
-        threshold = 1e-10
         for i,ts in enumerate(self.t_s):
            # Get the kernel
            ts_test = ts.get_kernel(chi_test)
@@ -164,7 +164,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
 
         # 7) The kmin of the provided file is a bit too high. Here we extrapolate using k^(n_s) to reach lower k values (down to kmin = 1e-7/Mpc)
         #   -> This would also not need to be done if the file was a bit more expansive in its k-range
-        new_k_min = 1e-7
+        new_k_min = float(self.config['k_min'])#1e-7
         Nk_small = int(np.log10(dpk['k'][0]/new_k_min)/np.log10(dpk['k'][1]/dpk['k'][0])+1)
         assert(Nk_small > 10)
         ksmall = np.geomspace(new_k_min,dpk['k'][0],endpoint=False,num=Nk_small)
@@ -203,7 +203,8 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
           lmax=self.lmax, uses_separability=seperability,
           size_fft_cutoff=sfftcutoff,tw_size=stw,integrated_tw_size=sitw,
           l_logstep=l_logstep, l_linstep = l_linstep,
-          t_size = st, t_spline_size = st_spline
+          t_size = st, t_spline_size = st_spline,
+          internal_logchi_i_offset = internal_logchi_i_offset
           )
 
         all_ells = self.get_ells()

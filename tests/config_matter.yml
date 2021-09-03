@@ -15,15 +15,15 @@ verbosity: 1
 # For a given required accuracy, the below parameters can be adjusted to give faster speeds!
 
 # Sizes for actual calculation (smaller is faster, but less accurate)
-size_FFTlog : 80                          # <-- Number of FFT coefficients
-size_chi_window_array : 40                # <-- Number of time points for time integrals for clustering
-size_chi_window_array_integrated : 240     # <-- Number of time points for time integrals for shear
-size_t_array : 60                         # <-- Number of t samples for final t integration
+size_FFTlog : 140                          # <-- Number of FFT coefficients
+size_chi_window_array : 60                # <-- Number of time points for time integrals for clustering
+size_chi_window_array_integrated : 480     # <-- Number of time points for time integrals for shear
+size_t_array : 100                         # <-- Number of t samples for final t integration
 
 # Array of L sampling values
 l_logstep : 1.1                           # <-- Logarithmic sampling stepsize for small L (bigger is faster)
 l_linstep : 75                            # <-- Linear stepsize for large L (bigger is faster)
-lmax : 250                                # <-- Maximum value of l (smaller is faster)
+lmax : 220                                # <-- Maximum value of l (smaller is faster)
 
 # Is everything seperable in k<->tau? This is NOT true if massive neutrinos or nonlinear corrections are present
 # This IS true if only a linear matter power spectrum (with scale-invariant growth) is considered
@@ -31,10 +31,12 @@ lmax : 250                                # <-- Maximum value of l (smaller is f
 seperable : False
 
 # Sizes for preparation of calculation (these usually need not be changed, smaller is faster)
-size_prep_t_array : 200                   # <-- Number of t samples for intermediate steps
+size_prep_t_array : 250                   # <-- Number of t samples for intermediate steps
 size_prep_chi_window_array : 800          # <-- Number of time points for intermediate steps (clustering)
 size_prep_chi_window_array_integrated : 1600 # <-- Number of time points for intermediate steps (shear)
 size_prep_FFTlog : 256                    # <-- Number of FFT coefficients befor any cutoff !! HAS to be a power of 2 for speed reasons !!
 
 # Minimal k value, shouldn't matter too much (please leave fixed)
 k_min : 1e-7
+# Lensing integration precision parameter (2e-31) --> Please leave fixed
+internal_logchi_i_offset : 2.01e-31
