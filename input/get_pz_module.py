@@ -216,24 +216,26 @@ def get_pz_func(zbias_cl, sigma_z_cl, F_cat_lyman_balmer_cl,
     # Uncomment this block if using Y10.
     # Edit filepaths to where you have unpacked the SRD tarball
     # SRD LSST Y10 direct from file, sources
-    #(z_low_src, zp_temp_src, z_high_src, pdf_temp_src) = np.loadtxt('/home/danielle/Research/iaxphoto/LSST_DESC_SRD_v1_release/forecasting/WL-LSS-CL/zdistris/zdistri_model_z0=1.100000e-01_beta=6.800000e-01_Y10_source', unpack=True) 
-    #fname_zp_out_src = './dNdz_srcs_LSSTSRD.dat'    
-    #nbin_src=5
+    (z_low_src, zp_temp_src, z_high_src, pdf_temp_src) = np.loadtxt('/data/danielle/research/iaxphoto/LSST_DESC_SRD_v1_release/forecasting/WL-LSS-CL/zdistris/zdistri_model_z0=1.100000e-01_beta=6.800000e-01_Y10_source', unpack=True)     
+    nbin_src=3
+    #fname_zp_out_src = './dNdz_srcs_nbins'+str(nbin_src)+'_quarterwidth_sigz0.01.dat'
+    fname_zp_out_src = './dNdz_srcs_nbins'+str(nbin_src)+'_fiducial_cutbins.dat'
     # SRD LSST Y10 direct from file, lenses
-    #(z_low_cl, zp_temp_cl, z_high_cl, pdf_temp_cl) = np.loadtxt('/home/danielle/Research/iaxphoto/LSST_DESC_SRD_v1_release/forecasting/WL-LSS-CL/zdistris/zdistri_model_z0=2.800000e-01_beta=9.000000e-01_Y10_lens', unpack=True) 
-    #fname_zp_out_cl = './dNdz_clust_LSSTSRD.dat'    
-    #nbin_cl=10
+    (z_low_cl, zp_temp_cl, z_high_cl, pdf_temp_cl) = np.loadtxt('/data/danielle/research/iaxphoto/LSST_DESC_SRD_v1_release/forecasting/WL-LSS-CL/zdistris/zdistri_model_z0=2.800000e-01_beta=9.000000e-01_Y10_lens', unpack=True) 
+    nbin_cl=6
+    #fname_zp_out_cl = './dNdz_clust_nbins'+str(nbin_cl)+'_quarterwidth_sigz0.006.dat'    
+    fname_zp_out_cl = './dNdz_clust_nbins'+str(nbin_cl)+'_fiducial_cutbins.dat'  
     
     # Uncomment this block if using Y1
     # Edit filepaths to where you have unpacked the SRD tarball 
     # SRD LSST Y1 direct from file sources
-    (z_low_cl, zp_temp_cl, z_high_cl, pdf_temp_cl) = np.loadtxt('/data/danielle/research/iaxphoto/LSST_DESC_SRD_v1_release/forecasting/WL-LSS-CL/zdistris/zdistri_model_z0=1.300000e-01_beta=7.800000e-01_Y1_source', unpack=True) 
-    fname_zp_out_cl = './dNdz_srcs_LSSTSRD_Y1.dat'    
-    nbin_cl=5 
+    #(z_low_cl, zp_temp_cl, z_high_cl, pdf_temp_cl) = np.loadtxt('/data/danielle/research/iaxphoto/LSST_DESC_SRD_v1_release/forecasting/WL-LSS-CL/zdistris/zdistri_model_z0=1.300000e-01_beta=7.800000e-01_Y1_source', unpack=True) 
+    #fname_zp_out_cl = './dNdz_srcs_LSSTSRD_Y1.dat'    
+    #nbin_cl=5 
     # SRD LSST Y1 direct from file lenses
-    (z_low_src, zp_temp_src, z_high_src, pdf_temp_src) = np.loadtxt('/data/danielle/research/iaxphoto/LSST_DESC_SRD_v1_release/forecasting/WL-LSS-CL/zdistris/zdistri_model_z0=2.600000e-01_beta=9.400000e-01_Y1_lens', unpack=True)
-    fname_zp_out_src = './dNdz_clust_LSSTSRD_Y1.dat'    
-    nbin_src=5
+    #(z_low_src, zp_temp_src, z_high_src, pdf_temp_src) = np.loadtxt('/data/danielle/research/iaxphoto/LSST_DESC_SRD_v1_release/forecasting/WL-LSS-CL/zdistris/zdistri_model_z0=2.600000e-01_beta=9.400000e-01_Y1_lens', unpack=True)
+    #fname_zp_out_src = './dNdz_clust_LSSTSRD_Y1.dat'    
+    #nbin_src=5
     
     #Interpolate and do higher z sampling
     interp_dNdz_src = scipy.interpolate.interp1d(zp_temp_src, pdf_temp_src)
@@ -251,22 +253,37 @@ def get_pz_func(zbias_cl, sigma_z_cl, F_cat_lyman_balmer_cl,
 
     # For sources, we want equal numbers of galaxies in each bin
     CDF = [ np.trapz(pdf_smail_src[0:i], z_support_src[0:i]) for i in range(len(pdf_smail_src))]
-    cuts_src = [0., 0.2, 0.4, 0.6, 0.8]
+    
+    # CHANGE THIS to change number of bins
+    #cuts_src = [0., 0.2, 0.4, 0.6, 0.8] #fiducial
+    #cuts_src = [0., 0.1, 0.2, 0.3, 0.4, 0.5] # half width
+    #cuts_src = [0., 0.05, 0.1, 0.15, 0.2, 0.25] # quarter width
+    #cuts_src = [0., 0.2, 0.4, 0.6, 0.8] # cut bins, 4 bins
+    cuts_src = [0., 0.2, 0.4, 0.6] # cut bins, 3 bins
+
     # Indices of bin edges:
     bin_edges_src= [next(j[0] for j in enumerate(CDF) if j[1]>cuts_src[i]) for i in range(len(cuts_src))]
-    bin_edges_src.append(len(z_support_src)-1)
+    #bin_edges_src.append(len(z_support_src)-1)
     
     # For lenses, we just use equal-spaced bins.
 
     # Uncomment this block for Y10
-    #cuts_cl = [0.2 + 0.1*i for i in range(0,11)]
-    #bin_edges_cl= [next(j[0] for j in enumerate(z_support_cl) if j[1]>cuts_cl[i]) for i in range(len(cuts_cl))]
+
+    # CHANGE THIS to change number of bins
+    #cuts_cl = [0.2 + 0.1*i for i in range(0,11)] # fiducial
+    #cuts_cl = [0.2 + 0.05*i for i in range(0,11)] # half width
+    #cuts_cl = [0.2 + 0.025*i for i in range(0,11)] # quarter width
+    #cuts_cl = [0.2 + 0.1*i for i in range(0,9)] # cut bins, 8 bins
+    cuts_cl = [0.2 + 0.1*i for i in range(0,7)] # cut bins, 6 bins
+    print(cuts_cl)
+
+    bin_edges_cl= [next(j[0] for j in enumerate(z_support_cl) if j[1]>cuts_cl[i]) for i in range(len(cuts_cl))]
     #bin_edges_cl.append(len(z_support_cl)-1)
 
     # Uncomment this block for Y1
-    cuts_cl = [0.2 + 0.2*i for i in range(0,6)]
-    bin_edges_cl= [next(j[0] for j in enumerate(z_support_cl) if j[1]>cuts_cl[i]) for i in range(len(cuts_cl))]
-    bin_edges_cl.append(len(z_support_cl)-1)
+    #cuts_cl = [0.2 + 0.2*i for i in range(0,6)]
+    #bin_edges_cl= [next(j[0] for j in enumerate(z_support_cl) if j[1]>cuts_cl[i]) for i in range(len(cuts_cl))]
+    #bin_edges_cl.append(len(z_support_cl)-1)
 
     # The following are the bin functions to bin the true redshift distribution
     # For the SRD, we want to use top-hats here.
@@ -284,9 +301,10 @@ def get_pz_func(zbias_cl, sigma_z_cl, F_cat_lyman_balmer_cl,
     bin5_cl = np.asarray(bin5_cl)
 
     # If you are using Y10, need to uncomment the below:
+    # CHANGE THIS to change number of bins
 
-    #bin6_cl = [1. if (z>z_support_cl[bin_edges_cl[5]] and z<=z_support_cl[bin_edges_cl[6]]) else 0. for z in z_support_cl]
-    #bin6_cl = np.asarray(bin6_cl)
+    bin6_cl = [1. if (z>z_support_cl[bin_edges_cl[5]] and z<=z_support_cl[bin_edges_cl[6]]) else 0. for z in z_support_cl]
+    bin6_cl = np.asarray(bin6_cl)
     #bin7_cl = [1. if (z>z_support_cl[bin_edges_cl[6]] and z<=z_support_cl[bin_edges_cl[7]]) else 0. for z in z_support_cl]
     #bin7_cl = np.asarray(bin7_cl)
     #bin8_cl = [1. if (z>z_support_cl[bin_edges_cl[7]] and z<=z_support_cl[bin_edges_cl[8]]) else 0. for z in z_support_cl]
@@ -296,19 +314,20 @@ def get_pz_func(zbias_cl, sigma_z_cl, F_cat_lyman_balmer_cl,
     #bin10_cl = [1. if (z>z_support_cl[bin_edges_cl[9]] and z<=z_support_cl[bin_edges_cl[10]]) else 0. for z in z_support_cl]
     #bin10_cl = np.asarray(bin10_cl)
 
+    # CHNAGE THIS to change number of bins
     tomo_list_cl = [bin1_cl/np.trapz(bin1_cl, z_support_cl),
                  bin2_cl/np.trapz(bin2_cl, z_support_cl),
                  bin3_cl/np.trapz(bin3_cl, z_support_cl),
                  bin4_cl/np.trapz(bin4_cl, z_support_cl),
-                 bin5_cl/np.trapz(bin5_cl, z_support_cl)]
-
-                 # If using Y10, need to uncomment these and include them in the list (remove ])
-                 #bin6_cl/np.trapz(bin6_cl, z_support_cl),
+                 bin5_cl/np.trapz(bin5_cl, z_support_cl), 
+                 bin6_cl/np.trapz(bin6_cl, z_support_cl)]#,
                  #bin7_cl/np.trapz(bin7_cl, z_support_cl),
-                 #bin8_cl/np.trapz(bin8_cl, z_support_cl),
+                 #bin8_cl/np.trapz(bin8_cl, z_support_cl)]#,
                  #bin9_cl/np.trapz(bin9_cl, z_support_cl),
                  #bin10_cl/np.trapz(bin10_cl, z_support_cl)]
+                 # If using Y10, need to uncomment 6-10 and include them in the list (remove ])
     
+    # CHANGE THIS to change number of bins
     # These are the bin functions for the sources - same number of bins for Y1 and Y10 so don't need to change this.
     bin1_src = [1. if (z>z_support_src[bin_edges_src[0]] and z<=z_support_src[bin_edges_src[1]]) else 0. for z in z_support_src]
     bin1_src = np.asarray(bin1_src)
@@ -316,15 +335,15 @@ def get_pz_func(zbias_cl, sigma_z_cl, F_cat_lyman_balmer_cl,
     bin2_src = np.asarray(bin2_src)
     bin3_src = [1. if (z>z_support_src[bin_edges_src[2]] and z<=z_support_src[bin_edges_src[3]]) else 0. for z in z_support_src]
     bin3_src = np.asarray(bin3_src)
-    bin4_src = [1. if (z>z_support_src[bin_edges_src[3]] and z<=z_support_src[bin_edges_src[4]]) else 0. for z in z_support_src]
-    bin4_src = np.asarray(bin4_src)
-    bin5_src = [1. if (z>z_support_src[bin_edges_src[4]] and z<=z_support_src[bin_edges_src[5]]) else 0. for z in z_support_src]
-    bin5_src = np.asarray(bin5_src)
+    #bin4_src = [1. if (z>z_support_src[bin_edges_src[3]] and z<=z_support_src[bin_edges_src[4]]) else 0. for z in z_support_src]
+    #bin4_src = np.asarray(bin4_src)
+    #bin5_src = [1. if (z>z_support_src[bin_edges_src[4]] and z<=z_support_src[bin_edges_src[5]]) else 0. for z in z_support_src]
+    #bin5_src = np.asarray(bin5_src)
     tomo_list_src = [bin1_src/np.trapz(bin1_src, z_support_src),
                  bin2_src/np.trapz(bin2_src, z_support_src),
-                 bin3_src/np.trapz(bin3_src, z_support_src),
-                 bin4_src/np.trapz(bin4_src, z_support_src),
-                 bin5_src/np.trapz(bin5_src, z_support_src)]                          
+                 bin3_src/np.trapz(bin3_src, z_support_src)]#,
+                 #bin4_src/np.trapz(bin4_src, z_support_src)]#,
+                 #bin5_src/np.trapz(bin5_src, z_support_src)]                          
 
     # Now pass all this stuff to the functions that setup the photo-z distributions
         
