@@ -2,7 +2,7 @@ import numpy as np
 import pyccl as ccl
 from .calculator_base import N5KCalculatorBase
 from scipy.interpolate import interp1d
-from fftlogx.fftlogx import *
+from fftlog_fang import fftlog_fang
 import time
 import sys
 np.set_printoptions(threshold=sys.maxsize)
@@ -123,8 +123,7 @@ class N5KCalculatorFKEM(N5KCalculatorBase):
 																							(z_s, nzs['dNdz_sh'][:, ni]),
 																							True)
 												for ni in range(0, 5)]
-				self.fk_g = [None]*len(self.t_g)
-				self.fk_s = [None]*len(self.t_s)
+
 
 		def _get_cl_limber(self, t1, t2, ls):
 				return ccl.angular_cl(self.cosmo, t1, t2, ls,
@@ -134,71 +133,112 @@ class N5KCalculatorFKEM(N5KCalculatorBase):
 				return ccl.angular_cl(self.cosmo_nonlin_part, t1, t2, ls,limber_integration_method='qag_quad')
 				# return ccl.angular_cl(self.cosmo, t1, t2, ls, limber_integration_method='qag_quad') - ccl.angular_cl(self.cosmo_nonlin_part, t1, t2, ls,limber_integration_method='qag_quad')
 
+		# def _get_cls_nonlimber_lin(self, fchi1, fchi2, ls, cl_type, i1, i2):
+		# 		nu = 1.01
+		# 		prefac = 1
+
+		# 		myfftlog1 = fftlog_fang(self.chi_logspace_arr, fchi1, nu=nu, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=112)
+		# 		Nell = ls.size
+		# 		cls_nonlimber_lin = np.zeros(Nell)
+
+		# 		if(cl_type == "gg"):
+		# 			myfftlog2 = fftlog_fang(self.chi_logspace_arr, fchi2, nu=nu, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=112)
+		# 			# t0 = time.time()
+		# 			for i in np.arange(Nell):
+		# 					ell = ls[i]
+		# 					k, fk1 = myfftlog1.fftlog(ell)
+		# 					k, fk2 = myfftlog2.fftlog(ell)
+		# 					cls_nonlimber_lin[i] = np.sum(fk1 * fk2 * k**3 * np.exp(self.pklin_interp(np.log(k))) ) * self.dlnr * 2./np.pi
+		# 			# t1 = time.time()
+		# 		if(cl_type == "gs"):
+		# 			prefac = np.sqrt((ls+2)*(ls+1)*(ls)*(ls-1))
+		# 			for i in np.arange(Nell):
+		# 					ell = ls[i]
+		# 					k, fk1 = myfftlog1.fftlog(ell)
+		# 					fk2 = (self.ker_chi_interpfuncs[i2])(np.log((ell+0.5)/k)) / ((ell+0.5)/k)**3 /k**3 * np.sqrt(np.pi / (2*ell+1))
+		# 					# print(np.c_[k,fk2])
+		# 					# exit()
+		# 					cls_nonlimber_lin[i] = np.sum(fk1 * fk2 * k**3 * np.exp(self.pklin_interp(np.log(k))) ) * self.dlnr * 2./np.pi
+
+		# 		# print(Nell, t1-t0)
+		# 		return cls_nonlimber_lin*prefac
+
+					# fchi2 /= self.chi_logspace_arr**2
+					# kpow -= 2
+					# prefac = np.sqrt((ls+2)*(ls+1)*(ls)*(ls-1))
+				# if(cl_type == "ss"):
+				# 	fchi1 /= self.chi_logspace_arr**2
+				# 	fchi2 /= self.chi_logspace_arr**2
+				# 	kpow -= 4
+				# 	prefac = (ls+2)*(ls+1)*(ls)*(ls-1)
 
 		def _get_cls_nonlimber_lin(self, fchi1, fchi2, ls, cl_type, i1, i2):
-				# print(cl_type, i1, i2)
+				print(cl_type, i1, i2)
 				nu = nu2= 1.01
 				prefac = 1
 				kpow = 3
 				Npad = Npad2 = 112
 
-				# myfftlog1 = fftlog(self.chi_logspace_arr, fchi1, nu=nu, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad)
-				# myfftlog2 = fftlog(self.chi_logspace_arr, fchi2, nu=nu2, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad2)
+				if(cl_type == "gs"):
+				# 	kpow -= 2
+				# 	fchi2 /= self.chi_logspace_arr**2
+					prefac = np.sqrt((ls+2)*(ls+1)*(ls)*(ls-1))
+					Npad2 = 624
+				# 	nu2 = 1.01
+				# 	Npad2= 1000
+				# 	N_extrap_low2 = 1000
+				if(cl_type == "ss"):
+					prefac = (ls+2)*(ls+1)*(ls)*(ls-1)
+					Npad = 624
+					Npad2 = 624
+
+				myfftlog1 = fftlog_fang(self.chi_logspace_arr, fchi1, nu=nu, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad)
+				myfftlog2 = fftlog_fang(self.chi_logspace_arr, fchi2, nu=nu2, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad2)
 				Nell = ls.size
 				cls_nonlimber_lin = np.zeros(Nell)
 
 				# t0 = time.time()
-				if(cl_type == "gg"):
-					if(self.fk_g[i1] is None):
-						myfftlog1 = fftlog(self.chi_logspace_arr, fchi1, nu=nu, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad)
-						self.k_logspace_arr, self.fk_g[i1] = myfftlog1.fftlog_ells(ls)
-					fk1 = self.fk_g[i1]
+				for i in np.arange(Nell):
+					ell = ls[i]
+					if(cl_type == "gg"):
+						k, fk1 = myfftlog1.fftlog(ell)
+						k, fk2 = myfftlog2.fftlog(ell)
 
-					if(self.fk_g[i1+i2] is None):
-						myfftlog2 = fftlog(self.chi_logspace_arr, fchi2, nu=nu2, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad2)
-						self.k_logspace_arr, self.fk_g[i1+i2] = myfftlog2.fftlog_ells(ls)
-					fk2 = self.fk_g[i1+i2]
+					if(cl_type == "gs"):
+						k, fk1 = myfftlog1.fftlog(ell)
+						k, fk2, fk2_low, fk2_high = myfftlog2.fftlog_triplet(ell)
+						fk2 = 1./(2*ell+1) * (fk2_low/(2*ell-1) + (1./(2*ell-1)+1./(2*ell+3))* fk2 + fk2_high/(2*ell+3) )
 
-				if(cl_type == "gs"):
-					if(self.fk_g[i1] is None):
-						myfftlog1 = fftlog(self.chi_logspace_arr, fchi1, nu=nu, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad)
-						self.k_logspace_arr, self.fk_g[i1] = myfftlog1.fftlog_ells(ls)
-					fk1 = self.fk_g[i1]
+					if(cl_type == "ss"):
+						k, fk1, fk1_low, fk1_high = myfftlog1.fftlog_triplet(ell)
+						fk1 = 1./(2*ell+1) * (fk1_low/(2*ell-1) + (1./(2*ell-1)+1./(2*ell+3))* fk1 + fk1_high/(2*ell+3) )
+						k, fk2, fk2_low, fk2_high = myfftlog2.fftlog_triplet(ell)
+						fk2 = 1./(2*ell+1) * (fk2_low/(2*ell-1) + (1./(2*ell-1)+1./(2*ell+3))* fk2 + fk2_high/(2*ell+3) )
 
-					if(self.fk_s[i2] is None):
-						myfftlog2 = fftlog(self.chi_logspace_arr, fchi2, nu=nu, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad)
-						self.k_logspace_arr, self.fk_s[i2] = myfftlog2.fftlog_modified_ells(ls)
-					fk2 = self.fk_s[i2]
-					
-					prefac = (ls+2)*(ls+1)*(ls)*(ls-1)
-					prefac[prefac<0] = 0.
-					prefac = np.sqrt(prefac)
+					# import matplotlib.pyplot as plt 
+					# if((cl_type=="gg" and i2==0 and i1==9) and i==40):
+					# 	plt.plot(k, fk1 * fk2 * k**kpow * np.exp(self.pklin_interp(np.log(k))))
+					# 	# plt.plot(k, fk1)
+					# 	# plt.plot(k, fk2)
+					# 	# plt.plot(k,fk1*fk2)
+					# 	plt.xscale('log')
+					# 	# plt.yscale('log')
+					# 	plt.show()
+					# 	# exit()
 
-				if(cl_type == "ss"):
-					prefac = (ls+2)*(ls+1)*(ls)*(ls-1)
-					prefac[prefac<0] = 0.
 
-					if(self.fk_s[i1] is None):
-						myfftlog1 = fftlog(self.chi_logspace_arr, fchi1, nu=nu, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad)
-						self.k_logspace_arr, self.fk_s[i1] = myfftlog1.fftlog_modified_ells(ls)
-					fk1 = self.fk_s[i1]	
-
-					if(self.fk_s[i1+i2] is None):
-						myfftlog2 = fftlog(self.chi_logspace_arr, fchi2, nu=nu, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad)
-						self.k_logspace_arr, self.fk_s[i1+i2] = myfftlog2.fftlog_modified_ells(ls)
-					fk2 = self.fk_s[i1+i2]
-
-				k = self.k_logspace_arr
-				cls_nonlimber_lin = np.sum(fk1 * fk2 * k**kpow * np.exp(self.pklin_interp(np.log(k))), axis=1 ) * self.dlnr * 2./np.pi
-
+					cls_nonlimber_lin[i] = np.sum(fk1 * fk2 * k**kpow * np.exp(self.pklin_interp(np.log(k))) ) * self.dlnr * 2./np.pi
 				# t1 = time.time()
 				# print(Nell, t1-t0)
 				return cls_nonlimber_lin*prefac
 
 		def _get_cl_nonlimber_fang(self, t1, t2, ls, i1, i2, cl_type):
 
-				l_switch = 200
 				if(cl_type=='gg'):
+					# if(i1==i2):
+					# 	l_switch = 400
+					# else:
+					l_switch = 400
 					ls_nonlim = ls[ls<l_switch]
 					cls_limber_nonlin_part = self._get_cl_limber_nonlin_part(t1, t2, ls_nonlim)
 					cls_nonlimber_lin = self._get_cls_nonlimber_lin(self.t_g_logspace[i1], self.t_g_logspace[i1+i2], ls_nonlim, cl_type, i1, i2)
@@ -211,25 +251,24 @@ class N5KCalculatorFKEM(N5KCalculatorBase):
 				# 	cls_nonlimber_lin =  self._get_cls_nonlimber_lin(self.t_s_logspace[i1], self.t_s_logspace[i1+i2], ls_nonlim)
 
 				if(cl_type=='gs'):
-					ls_nonlim = ls[ls<l_switch]
+					ls_nonlim = ls[ls<400]
 					cls_limber_nonlin_part = self._get_cl_limber_nonlin_part(t1, t2, ls_nonlim)
 					cls_nonlimber_lin = self._get_cls_nonlimber_lin(self.t_g_logspace[i1], self.t_s_logspace[i2], ls_nonlim, cl_type, i1, i2)
 					cls_nonlimber = cls_limber_nonlin_part + cls_nonlimber_lin
-					cls_limber = self._get_cl_limber(t1, t2, ls[ls>=l_switch])
+					cls_limber = self._get_cl_limber(t1, t2, ls[ls>=400])
 					return np.hstack((cls_nonlimber, cls_limber))
 
 				# elif(cl_type=='gs'):
 				# 	cls_nonlimber_lin =  self._get_cls_nonlimber_lin(self.t_g_logspace[i1], self.t_s_logspace[i2], ls_nonlim)
 				# else:
 				# 	cls_nonlimber_lin =  self._get_cls_nonlimber_lin(self.t_s_logspace[i1], self.t_s_logspace[i1+i2], ls_nonlim)
-
 				if(cl_type=='ss'):
-					ls_nonlim = ls[ls<l_switch]
+					ls_nonlim = ls[ls<400]
 					cls_limber_nonlin_part = self._get_cl_limber_nonlin_part(t1, t2, ls_nonlim)
 					cls_nonlimber_lin = self._get_cls_nonlimber_lin(self.t_s_logspace[i1], self.t_s_logspace[i1+i2], ls_nonlim, cl_type, i1, i2)
 					cls_nonlimber = cls_limber_nonlin_part + cls_nonlimber_lin
 					# cls_nonlimber = cls_limber_nonlin_part + cls_nonlimber_lin
-					cls_limber = self._get_cl_limber(t1, t2, ls[ls>=l_switch])
+					cls_limber = self._get_cl_limber(t1, t2, ls[ls>=400])
 					return np.hstack((cls_nonlimber, cls_limber))								
 				else:
 					return self._get_cl_limber(t1, t2, ls)

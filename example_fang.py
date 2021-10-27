@@ -1,3 +1,5 @@
+import sys
+sys.path.append("fftlogx/")
 import numpy as np
 import time
 import n5k

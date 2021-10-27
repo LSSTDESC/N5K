@@ -1,4 +1,6 @@
 """
+This module is DEPRECATED!!!! I'm using wrapped C code
+=====
 python module for calculating integrals with 1 Bessel functions.
 This module contains:
 -- FFTLog method for integrals with 1 spherical Bessel function;

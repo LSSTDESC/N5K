@@ -3,19 +3,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 if __name__ == "__main__":
-    names = ["CCL"]  # Add more names to include in the SN vs ell plot
+    names = ["FKEM"]  # Add more names to include in the SN vs ell plot
 
     for name in names:
-        comp_vs_bm = np.load(f"tests/tester_comp_{name}.npz")
+        comp_vs_bm = np.load("tests/tester_comp_%s.npz"%(name))
 
         sn_per_l = comp_vs_bm["sn_per_l"]
         cumulative_sn_per_l = np.sqrt(np.cumsum(sn_per_l**2))
 
         ell = comp_vs_bm["ls"]
-        plt.semilogx(ell, comp_vs_bm["sn_per_l"], label=f"SN {name}")
-        plt.semilogx(ell, cumulative_sn_per_l, label=f"Cumulative SN {name}")
+        plt.semilogx(ell, comp_vs_bm["sn_per_l"], label="SN %s"%(name))
+        plt.semilogx(ell, cumulative_sn_per_l, label="Cumulative SN %s"%(name))
 
+    print(r"cumulative $\Delta\chi^2$ at l<200:", cumulative_sn_per_l[ell<200][:-1]**2)
     plt.axhline(0, c="k", lw=1)
+
 
     plt.legend(frameon=False)
     plt.xlabel("$\\ell$")
@@ -24,13 +26,13 @@ if __name__ == "__main__":
 
     plt.figure()
 
-    comp_vs_bm = np.load("tests/tester_comp_CCL.npz")
+    comp_vs_bm = np.load("tests/tester_comp_FKEM.npz")
     ell = comp_vs_bm["ls"]
-    err = np.concatenate([comp_vs_bm[f"cl_{t}_err"]
+    err = np.concatenate([comp_vs_bm["cl_%s_err"%(t)]
                           for t in ["gg", "gs", "ss"]], axis=0)
-    cl = np.concatenate([comp_vs_bm[f"cl_{t}"]
+    cl = np.concatenate([comp_vs_bm["cl_%s"%(t)]
                          for t in ["gg", "gs", "ss"]], axis=0)
-    cl_bm = np.concatenate([comp_vs_bm[f"cl_{t}_bm"]
+    cl_bm = np.concatenate([comp_vs_bm["cl_%s_bm"%(t)]
                             for t in ["gg", "gs", "ss"]], axis=0)
 
     plt.imshow((cl-cl_bm)/err,
