@@ -1,5 +1,7 @@
 # N5K: Non-local No-Nonsense Non-Limber Numerical Knockout
 
+**Deadline extension:** To allow time to properly address some recently flagged issues with the accuracy benchmarks, we are extending the final challenge deadline to **February 5th, 2021**.
+
 In this challenge, you are asked to compute a set of power spectra for a 3x2pt (cosmic shear, galaxy-galaxy lensing, and galaxy clustering) analysis without the use of the Limber approximation.
 
 The challenge entries will be evaluated on the basis of accuracy, speed, and integrability with the [Core Cosmology Library](https://github.com/LSSTDESC/CCL/) (CCL). CCL is python (with some heavy-lifting done in C under the hood); a code which is in python or has a python wrapper will satisfy the integrability criteria. Given this, the code which can accomplish the challenge task fastest and within the accuracy requirements of an LSST Y10 cosmological analysis will win the challenge. The winning code will be incorporated for use as the non-Limber integration tool for CCL.
@@ -18,11 +20,16 @@ For the purposes of the challenge, we ignore intrinsic alignments, redshift-spac
 
 [calculator_base.py](n5k/calculator_base.py) contains a base class `N5KCalculatorBase`. Write a subclass of `N5KCalculatorBase` which contains methods `setup()` (to set up your nonlimber calculation), run `run()` (to run it) and `teardown()` (to clean up any dirt you've created). Only the `run()` method will be timed (but don't be cheeky!). [calculator_ccl.py](n5k/calculator_ccl.py) contains an example of what this would look like doing the calculation using CCL's current (Limber) calculation tools. If you need to modify the challenge machinery (e.g. the base class itself or other provided files), you must make a separate pull request to do this (i.e. don't do it in your challenge entry pull request).
 
-Specifically, the non-Limber integral to be computed for each element of the angular power spectrum is:
+Specifically, the non-Limber integral to be computed for each element of the angular power spectrum is,for clustering:
+<a href="https://www.codecogs.com/eqnedit.php?latex=\dpi{200}&space;C_\ell&space;=&space;\frac{2}{\pi}&space;\int_0^\infty&space;d\chi_1&space;K(\chi_1)&space;\int_0^\infty&space;d\chi_2&space;K(\chi_2)&space;\int_0^\infty&space;dk&space;\,&space;k^2&space;P_\delta(k,z_1,z_2)j_\ell(k&space;\chi_1)j_\ell(k&space;\chi_2)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\dpi{200}&space;C_\ell&space;=&space;\frac{2}{\pi}&space;\int_0^\infty&space;d\chi_1&space;K(\chi_1)&space;\int_0^\infty&space;d\chi_2&space;K(\chi_2)&space;\int_0^\infty&space;dk&space;\,&space;k^2&space;P_\delta(k,z_1,z_2)j_\ell(k&space;\chi_1)j_\ell(k&space;\chi_2)" title="" /></a>
 
-<img src="https://render.githubusercontent.com/render/math?math=C_\ell = \frac{2}{\pi} \int_0^\infty d\chi_1 K(\chi_1) \int_0^\infty d\chi_2 K(\chi_2) \int_0^\infty dk \, k^2 P_\delta(k,z_1,z_2)j_\ell(k \chi_1)j_\ell(k \chi_2)">
+for cosmic shear:
+<a href="https://www.codecogs.com/eqnedit.php?latex=\dpi{200}&space;C_\ell&space;=&space;\frac{2}{\pi}&space;\frac{(\ell&space;&plus;2)!}{(\ell-2)!}&space;\int_0^\infty&space;d\chi_1&space;K(\chi_1)&space;\int_0^\infty&space;d\chi_2&space;K(\chi_2)&space;\int_0^\infty&space;dk&space;\,&space;k^2&space;P_\delta(k,z_1,z_2)\frac{j_\ell(k&space;\chi_1)}{(k\chi_1)^2}\frac{j_\ell(k&space;\chi_2)}{(k&space;\chi_2)^2}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\dpi{200}&space;C_\ell&space;=&space;\frac{2}{\pi}&space;\frac{(\ell&space;&plus;2)!}{(\ell-2)!}&space;\int_0^\infty&space;d\chi_1&space;K(\chi_1)&space;\int_0^\infty&space;d\chi_2&space;K(\chi_2)&space;\int_0^\infty&space;dk&space;\,&space;k^2&space;P_\delta(k,z_1,z_2)\frac{j_\ell(k&space;\chi_1)}{(k\chi_1)^2}\frac{j_\ell(k&space;\chi_2)}{(k&space;\chi_2)^2}" title="{}" /></a>
 
-where K are the kernels and <img src="https://render.githubusercontent.com/render/math?math=P_\delta"> is the non-linear matter power spectrum. You should assume that <img src="https://render.githubusercontent.com/render/math?math=P_\delta(k,z_1,z_2) = \sqrt{P_\delta(k,z_1)P_\delta(k,z_2)}">.
+and for galaxy-galaxy lensing (assuming quantities labeled with '1' are associated with shear and '2' with number counts):
+<a href="https://www.codecogs.com/eqnedit.php?latex=\dpi{200}&space;C_\ell&space;=&space;\frac{2}{\pi}&space;\sqrt{\frac{(\ell&space;&plus;2)!}{(\ell-2)!}}&space;\int_0^\infty&space;d\chi_1&space;K(\chi_1)&space;\int_0^\infty&space;d\chi_2&space;K(\chi_2)&space;\int_0^\infty&space;dk&space;\,&space;k^2&space;P_\delta(k,z_1,z_2)\frac{j_\ell(k&space;\chi_1)}{(k\chi_1)^2}j_\ell(k&space;\chi_2)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\dpi{200}&space;C_\ell&space;=&space;\frac{2}{\pi}&space;\sqrt{\frac{(\ell&space;&plus;2)!}{(\ell-2)!}}&space;\int_0^\infty&space;d\chi_1&space;K(\chi_1)&space;\int_0^\infty&space;d\chi_2&space;K(\chi_2)&space;\int_0^\infty&space;dk&space;\,&space;k^2&space;P_\delta(k,z_1,z_2)\frac{j_\ell(k&space;\chi_1)}{(k\chi_1)^2}j_\ell(k&space;\chi_2)" title="" /></a>
+
+where K is in each case the kernel for the appropriate tracer (as provided in `input/kernels.npz`) and <img src="https://render.githubusercontent.com/render/math?math=P_\delta"> is the non-linear matter power spectrum. You should assume that <img src="https://render.githubusercontent.com/render/math?math=P_\delta(k,z_1,z_2) = \sqrt{P_\delta(k,z_1)P_\delta(k,z_2)}">.
 
 Make a pull request to this repository which includes your new subclass as well as a script which creates the conda or virtualenv environment in which your entry can run. Remember, if you need to modify the provided common code, like the base class, make a separate PR!
 
@@ -33,7 +40,7 @@ If you choose to use given dN/dz's instead of the precomputed full kernels, it i
 
 To enter, you must have made a draft entry pull request on this repository by **January 15, 2021** (17:00 PST). 
 
-You will then have one week to finalise your entry. Final updates to entry pull requests must be made by **January 22, 2021** (17:00 PST).
+You will then have time to finalise your entry. Final updates to entry pull requests must be made by **February 5th, 2021** (17:00 PST) (extended from January 22nd, 2021).
 
 
 ## FAQ
