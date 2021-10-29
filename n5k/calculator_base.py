@@ -42,8 +42,8 @@ class N5KCalculatorBase(object):
                         2.118943])
         return {'b_g': b_g}
 
-    def get_tracer_dndzs(self):
-        dNdz_file = np.load('input/dNdzs.npz')
+    def get_tracer_dndzs(self, filename='input/dNdzs.npz'):
+        dNdz_file = np.load(filename)
         z_sh = dNdz_file['z_sh']
         dNdz_sh = dNdz_file['dNdz_sh']
         z_cl = dNdz_file['z_cl']
@@ -73,8 +73,8 @@ class N5KCalculatorBase(object):
         nl_sh = e_rms**2/(ns_ints*tosrad)
         return nl_cl, nl_sh
 
-    def get_tracer_kernels(self):
-        return np.load("input/kernels.npz")
+    def get_tracer_kernels(self, filename='input/kernels.npz'):
+        return np.load(filename)
 
     def get_ells(self):
         return np.unique(np.geomspace(2, 2000, 128).astype(int)).astype(float)
