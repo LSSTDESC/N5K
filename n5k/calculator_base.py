@@ -73,7 +73,7 @@ class N5KCalculatorBase(object):
         nl_sh = e_rms**2/(ns_ints*tosrad)
         return nl_cl, nl_sh
 
-    def get_tracer_kernels(self, filename='input/kernels.npz):
+    def get_tracer_kernels(self, filename='input/kernels.npz'):
         return np.load(filename)
 
     def get_ells(self):

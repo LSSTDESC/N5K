@@ -22,7 +22,7 @@ pkln = np.array([ccl.linear_matter_power(cosmo, k, a)
                  for a in 1/(1+z)])
 pknl = np.array([ccl.nonlin_matter_power(cosmo, k, a)
                  for a in 1/(1+z)])
-#np.savez('input/pk.npz', k=k, z=z, pk_nl=pknl, pk_lin=pkln)
+np.savez('input/pk.npz', k=k, z=z, pk_nl=pknl, pk_lin=pkln)
 
 # Generate tracer kernels
 dndzs = cal.get_tracer_dndzs(filename='input/additional_dNdzs/dNdzs_3src_6lens.npz')
