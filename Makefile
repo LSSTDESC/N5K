@@ -1,6 +1,12 @@
 MDIR := $(shell pwd)
 
 CC = gcc
+
+LIB_LINK =
+
+if ! [ -e ${GSL_DIR} ]; then LIB_LINK += -I ${GSL_DIR}/include -L ${GSL_DIR}/lib ; fi;
+if ! [ -e ${FFTW_DIR} ]; then LIB_LINK += -I ${FFTW_INC} -L ${FFTW_DIR} ; fi;
+
 LIB_LINK = -lgsl -lgslcblas -lm -lfftw3
 FLAGS = -fPIC -Wall -O3 -ffast-math
 BUILD_DIR = $(MDIR)/build

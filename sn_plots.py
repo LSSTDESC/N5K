@@ -21,7 +21,9 @@ if __name__ == "__main__":
 
     plt.legend(frameon=False)
     plt.xlabel("$\\ell$")
-    plt.ylabel("SN")
+    plt.ylabel(r"$\sqrt{\Delta\chi^2}$")
+    plt.xlim(0,3000)
+    plt.axvline(200, c="r", lw =2)
     plt.savefig("plots/sn_vs_ell.png")
 
     plt.figure()
