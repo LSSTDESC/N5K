@@ -18,6 +18,13 @@ class N5KCalculatorLevin(N5KCalculatorBase):
         ell_max_non_Limber = self.config.get('ell_max_non_Limber', 95)
         ell_max_ext_Limber = self.config.get('ell_max_ext_Limber', 1000)
 
+        extra_kwargs = {k: self.config[k]
+                        for k in ["tol_rel",
+                                  "limber_tolerance",
+                                  "min_interval",
+                                  "maximum_number_subintervals"]
+                        if k in self.config}
+
         ell = self.get_ells().astype(int)
         self.levin_calculator = levinpower.LevinPower(
                           ell,
@@ -31,7 +38,8 @@ class N5KCalculatorLevin(N5KCalculatorBase):
                           pk["pk_nl"].flatten(),
                           precompute_splines=precompute_splines,
                           ell_max_non_Limber=ell_max_non_Limber,
-                          ell_max_ext_Limber=ell_max_ext_Limber)
+                          ell_max_ext_Limber=ell_max_ext_Limber,
+                          **extra_kwargs)
 
     def run(self):
         # Compute power spectra
