@@ -44,7 +44,7 @@ class N5KCalculatorFKEM(N5KCalculatorBase):
 
 				chi_min = ccl.comoving_radial_distance(cosmo=self.cosmo, a=1./(1.+0.002))
 				chi_max = ccl.comoving_radial_distance(cosmo=self.cosmo, a=1./(1.+4.))
-				Nchi = 800
+				Nchi = 200
 				self.chi_logspace_arr = np.logspace(np.log10(chi_min),np.log10(chi_max),num=Nchi, endpoint=True)
 				self.dlnr = np.log(chi_max/chi_min)/(Nchi-1.)
 				a_arr = ccl.scale_factor_of_chi(self.cosmo, self.chi_logspace_arr)
@@ -140,7 +140,7 @@ class N5KCalculatorFKEM(N5KCalculatorBase):
 				nu = nu2= 1.01
 				prefac = 1
 				kpow = 3
-				Npad = Npad2 = 112
+				Npad = Npad2 = 28
 
 				# myfftlog1 = fftlog(self.chi_logspace_arr, fchi1, nu=nu, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad)
 				# myfftlog2 = fftlog(self.chi_logspace_arr, fchi2, nu=nu2, N_extrap_low=0, N_extrap_high=0, c_window_width=0.25, N_pad=Npad2)
