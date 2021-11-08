@@ -4,10 +4,18 @@ CC = gcc
 
 LIB_LINK =
 
-if ! [ -e ${GSL_DIR} ]; then LIB_LINK += -I ${GSL_DIR}/include -L ${GSL_DIR}/lib ; fi;
-if ! [ -e ${FFTW_DIR} ]; then LIB_LINK += -I ${FFTW_INC} -L ${FFTW_DIR} ; fi;
+GSL_DIR := $(shell echo ${GSL_DIR})
+FFTW_INC := $(shell echo ${FFTW_INC})
+FFTW_DIR := $(shell echo ${FFTW_DIR})
 
-LIB_LINK = -lgsl -lgslcblas -lm -lfftw3
+ifneq ($(GSL_DIR),)
+  LIB_LINK += -I $(GSL_DIR)/include -L $(GSL_DIR)/lib
+endif
+ifneq ($(FFTW_DIR),)
+  LIB_LINK += -I $(FFTW_INC) -L $(FFTW_DIR)
+endif
+
+LIB_LINK += -lgsl -lgslcblas -lm -lfftw3
 FLAGS = -fPIC -Wall -O3 -ffast-math
 BUILD_DIR = $(MDIR)/build
 LIB = libfftlogx
