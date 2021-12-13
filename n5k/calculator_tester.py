@@ -124,6 +124,7 @@ class N5KCalculatorTester(N5KCalculatorBase):
                 plt.xlabel(r'$\ell$', fontsize=16)
                 plt.ylabel(r'$\Delta C_\ell/\sigma(C_\ell)$', fontsize=16)
                 plt.xscale('log')
+                plt.ylim(-0.01,0.01)
                 plt.savefig(fname, bbox_inches='tight')
                 plt.close()
 
