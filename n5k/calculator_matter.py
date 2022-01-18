@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 # Although I wrote this whole code by myself, in documentation I often write 'we'. Sorry about that.
 
 class N5KCalculatorMATTER(N5KCalculatorBase):
-    name = 'matter (FFTlog)'
+    name = 'MATTER'
 
     def setup(self):
         # RELEVANT PRECISION PARAMTERS

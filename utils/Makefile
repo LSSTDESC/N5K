@@ -33,7 +33,7 @@ all: matter libmatter.a matterlib
 SOURCE = matter.o fft.o hypergeom.o arrays.o common.o
 
 %.o:  %.c
-	cd build; $(CC) $(OPTFLAG) $(OMPFLAG) $(CCFLAG) $(INCLUDES) -c ../$< -o $*.o
+	mkdir -p build; cd build; $(CC) $(OPTFLAG) $(OMPFLAG) $(CCFLAG) $(INCLUDES) -c ../$< -o $*.o
 
 libmatter.a: $(SOURCE)
 	$(AR)  $@ $(addprefix build/, $(SOURCE))
@@ -50,7 +50,7 @@ endif
 	cd python; export CC=$(CC); $(PYTHON) autosetup.py install || $(PYTHON) autosetup.py install --user
 	echo "hello world"
 	rm python/autosetup.py
-	
+
 
 clean:
 	rm -f libmatter.a

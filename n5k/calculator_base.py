@@ -9,7 +9,7 @@ class N5KCalculatorBase(object):
 
     def __init__(self, fname_config):
         if isinstance(fname_config, dict):
-            self.config = fname_Config
+            self.config = fname_config
         else:
             import yaml
 
