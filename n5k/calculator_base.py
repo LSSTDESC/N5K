@@ -8,10 +8,13 @@ class N5KCalculatorBase(object):
     nb_s = 5
 
     def __init__(self, fname_config):
-        import yaml
+        if isinstance(fname_config, dict):
+            self.config = fname_Config
+        else:
+            import yaml
 
-        with open(fname_config) as f:
-            self.config = yaml.safe_load(f)
+            with open(fname_config) as f:
+                self.config = yaml.safe_load(f)
 
         self._check_config_sanity()
 
