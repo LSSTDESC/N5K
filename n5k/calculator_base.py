@@ -51,6 +51,10 @@ class N5KCalculatorBase(object):
         dNdz_sh = dNdz_file['dNdz_sh']
         z_cl = dNdz_file['z_cl']
         dNdz_cl = dNdz_file['dNdz_cl']
+        if 'select_cl' in self.config:
+            dNdz_cl = np.array([dNdz_cl[:, i] for i in self.config['select_cl']]).T
+        if 'select_sh' in self.config:
+            dNdz_sh = np.array([dNdz_sh[:, i] for i in self.config['select_sh']]).T
         return {'z_sh': z_sh, 'dNdz_sh': dNdz_sh,
                 'z_cl': z_cl, 'dNdz_cl': dNdz_cl}
 
@@ -77,7 +81,19 @@ class N5KCalculatorBase(object):
         return nl_cl, nl_sh
 
     def get_tracer_kernels(self, filename='input/kernels.npz'):
-        return np.load(filename)
+        d = np.load(filename)
+        kernels_cl = d['kernels_cl']
+        kernels_sh = d['kernels_sh']
+        if 'select_cl' in self.config:
+            kernels_cl = np.array([kernels_cl[i, :] for i in self.config['select_cl']])
+        if 'select_sh' in self.config:
+            kernels_sh = np.array([kernels_sh[i, :] for i in self.config['select_sh']])
+        return {'z_cl': d['z_cl'],
+                'chi_cl': d['chi_cl'],
+                'kernels_cl': kernels_cl,
+                'z_sh': d['z_sh'],
+                'chi_sh': d['chi_sh'],
+                'kernels_sh': kernels_sh}
 
     def get_ells(self):
         return np.unique(np.geomspace(2, 2000, 128).astype(int)).astype(float)
