@@ -1,7 +1,7 @@
 # N5K: Non-local No-Nonsense Non-Limber Numerical Knockout
 
-**Deadline extension:** To allow time to properly address some recently flagged issues with the accuracy benchmarks, we are extending the final challenge deadline to **February 5th, 2021**.
-
+## First round instructions
+**Skip this if you've already submitted an entry. The deadline for these was almost 1 year ago anyway!! Go to "Second round".**
 In this challenge, you are asked to compute a set of power spectra for a 3x2pt (cosmic shear, galaxy-galaxy lensing, and galaxy clustering) analysis without the use of the Limber approximation.
 
 The challenge entries will be evaluated on the basis of accuracy, speed, and integrability with the [Core Cosmology Library](https://github.com/LSSTDESC/CCL/) (CCL). CCL is python (with some heavy-lifting done in C under the hood); a code which is in python or has a python wrapper will satisfy the integrability criteria. Given this, the code which can accomplish the challenge task fastest and within the accuracy requirements of an LSST Y10 cosmological analysis will win the challenge. The winning code will be incorporated for use as the non-Limber integration tool for CCL.
@@ -35,12 +35,28 @@ Make a pull request to this repository which includes your new subclass as well 
 
 If you choose to use given dN/dz's instead of the precomputed full kernels, it is your responsibility to ensure other required cosmological factors are correctly computed using the parameters defined in the base class.
 
+## Second round instructions
+
+All entries have now been merged into master, with slight modifications (none to the base code) to help us run all entries on the same scripts. We have run 3 tests:
+1. Compute time as a function of number of OpenMP cores.
+2. Compute time as a function of number of bins.
+3. Goodness of fit (Delta chi^2) as a function of bin width.
+
+Besides these, we want to quantify:
+
+4. Time as a function of goodness of fit for the following target Delta chi^2s on ell<200: (0.2, 0.7, 1.2, 1.7).
+
+You have privately received our first results regarding tests 1, 2, and 3 above. For this we used the `run_timer.sh`, `run_timer_nbins.sh` and `run_benchmarks.sh` scripts respectively, which themselves use the configuration files `conf/conf_<entry>.yml`. These were run on an interactive node on Cori.
+
+For this last round we'd like to ask you to:
+- Give us instructions (if needed) for how to optimize the results of tests 1-3 above. For this, you may tell us on slack, make modifications to the code in a PR, or send us new configuration files.
+- Send us configuration files/settings for test 4.
+
+Note that, as we mentioned originally, parallelization is not a priority for this, so do not worry if the results of test 1 are underwhelming for your code. Still, it'd be good if you can tell us which part of the code are parallelized, which ones could be parallelized but aren't, and which ones can't be parallelized.
 
 ## Deadline
 
-To enter, you must have made a draft entry pull request on this repository by **January 15, 2021** (17:00 PST). 
-
-You will then have time to finalise your entry. Final updates to entry pull requests must be made by **February 5th, 2021** (17:00 PST) (extended from January 22nd, 2021).
+The deadline for this second round is **February 4th, 2022** (17:00 PST).
 
 
 ## FAQ
