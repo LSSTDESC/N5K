@@ -17,7 +17,7 @@ conf_test = {'output_prefix': 'outputs/tester',
              'benchmark_prefix': 'tests/benchmarks_nl'}
 if width != 'none':
     name_lc = name.lower()
-    conf_test['benchmark_prefix'] = f'tests/new_new/benchmarks_nl_{width}'
+    conf_test['benchmark_prefix'] = f'tests/benchmarks_nl_{width}'
     conf['dndz_file'] = f'input/additional_dNdzs/dNdzs_{width}width.npz'
     conf['kernel_file'] = f'input/additional_kernels/kernels_{width}width.npz'
     conf['output_prefix'] = f'outputs/{name_lc}_{width}'
