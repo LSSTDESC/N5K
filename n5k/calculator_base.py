@@ -4,8 +4,6 @@ import numpy as np
 class N5KCalculatorBase(object):
     name = 'Base'
     needed_fields = ['output_prefix']
-    nb_g = 10
-    nb_s = 5
 
     def __init__(self, fname_config):
         if isinstance(fname_config, dict):
@@ -15,6 +13,13 @@ class N5KCalculatorBase(object):
 
             with open(fname_config) as f:
                 self.config = yaml.safe_load(f)
+
+        self.nb_g = 10
+        self.nb_s = 5
+        if 'select_cl' in self.config:
+            self.nb_g = len(self.config['select_cl'])
+        if 'select_sh' in self.config:
+            self.nb_s = len(self.config['select_sh'])
 
         self._check_config_sanity()
 
@@ -45,7 +50,8 @@ class N5KCalculatorBase(object):
                         2.118943])
         return {'b_g': b_g}
 
-    def get_tracer_dndzs(self, filename='input/dNdzs.npz'):
+    def get_tracer_dndzs(self):
+        filename = self.config.get('dndz_file', 'input/dNdzs_fullwidth.npz')
         dNdz_file = np.load(filename)
         z_sh = dNdz_file['z_sh']
         dNdz_sh = dNdz_file['dNdz_sh']
@@ -80,7 +86,8 @@ class N5KCalculatorBase(object):
         nl_sh = e_rms**2/(ns_ints*tosrad)
         return nl_cl, nl_sh
 
-    def get_tracer_kernels(self, filename='input/kernels.npz'):
+    def get_tracer_kernels(self):
+        filename = self.config.get('kernel_file', 'input/kernels_fullwidth.npz')
         d = np.load(filename)
         kernels_cl = d['kernels_cl']
         kernels_sh = d['kernels_sh']

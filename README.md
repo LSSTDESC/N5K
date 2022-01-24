@@ -11,10 +11,10 @@ All entrants will have the opportunity to be an author on the resulting paper, w
 ## How to enter
 
 The challenge asks you to compute the angular spectra required for a 3x2pt analysis setup similar to the LSST Y10 scenario in the [LSST DESC Science Requirements Document v1](https://arxiv.org/pdf/1809.01669.pdf). The 'input' folder of this repo contains some required inputs for this calculation:
-- kernels for the 10 number counts tracers and 5 weak lensing tracers as a function of comoving radial distance chi  [N5K/input/kernels.npz](input/kernels.npz).
+- kernels for the 10 number counts tracers and 5 weak lensing tracers as a function of comoving radial distance chi  [N5K/input/kernels_fullwidth.npz](input/kernels_fullwidth.npz).
 - Linear and non-linear matter power spectrum as a function of k and z [N5K/input/Pk.npz](input/Pk.npz).
 - Background radial comoving distance and normalized expansion rate (H(z)/H(0)), in case you need them: [N5K/input/background.npz](input/background.npz).
-- dN/dz's for the 10 number counts tracers and 5 weak lensing tracers as a function of z [N5K/input/dNdzs.npz](input/dNdzs.npz).
+- dN/dz's for the 10 number counts tracers and 5 weak lensing tracers as a function of z [N5K/input/dNdzs_fullwidth.npz](input/dNdzs_fullwidth.npz).
 
 For the purposes of the challenge, we ignore intrinsic alignments, redshift-space distortions, and magnification. The kernels are thus number counts and cosmic shear only.
 
@@ -29,7 +29,7 @@ for cosmic shear:
 and for galaxy-galaxy lensing (assuming quantities labeled with '1' are associated with shear and '2' with number counts):
 <a href="https://www.codecogs.com/eqnedit.php?latex=\dpi{200}&space;C_\ell&space;=&space;\frac{2}{\pi}&space;\sqrt{\frac{(\ell&space;&plus;2)!}{(\ell-2)!}}&space;\int_0^\infty&space;d\chi_1&space;K(\chi_1)&space;\int_0^\infty&space;d\chi_2&space;K(\chi_2)&space;\int_0^\infty&space;dk&space;\,&space;k^2&space;P_\delta(k,z_1,z_2)\frac{j_\ell(k&space;\chi_1)}{(k\chi_1)^2}j_\ell(k&space;\chi_2)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\dpi{200}&space;C_\ell&space;=&space;\frac{2}{\pi}&space;\sqrt{\frac{(\ell&space;&plus;2)!}{(\ell-2)!}}&space;\int_0^\infty&space;d\chi_1&space;K(\chi_1)&space;\int_0^\infty&space;d\chi_2&space;K(\chi_2)&space;\int_0^\infty&space;dk&space;\,&space;k^2&space;P_\delta(k,z_1,z_2)\frac{j_\ell(k&space;\chi_1)}{(k\chi_1)^2}j_\ell(k&space;\chi_2)" title="" /></a>
 
-where K is in each case the kernel for the appropriate tracer (as provided in `input/kernels.npz`) and <img src="https://render.githubusercontent.com/render/math?math=P_\delta"> is the non-linear matter power spectrum. You should assume that <img src="https://render.githubusercontent.com/render/math?math=P_\delta(k,z_1,z_2) = \sqrt{P_\delta(k,z_1)P_\delta(k,z_2)}">.
+where K is in each case the kernel for the appropriate tracer (as provided in `input/kernels_fullwidth.npz`) and <img src="https://render.githubusercontent.com/render/math?math=P_\delta"> is the non-linear matter power spectrum. You should assume that <img src="https://render.githubusercontent.com/render/math?math=P_\delta(k,z_1,z_2) = \sqrt{P_\delta(k,z_1)P_\delta(k,z_2)}">.
 
 Make a pull request to this repository which includes your new subclass as well as a script which creates the conda or virtualenv environment in which your entry can run. Remember, if you need to modify the provided common code, like the base class, make a separate PR!
 

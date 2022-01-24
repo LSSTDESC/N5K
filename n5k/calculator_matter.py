@@ -75,7 +75,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         # -> Now we perform (!)preprocessing(!) steps relevant to the 'matter (FFTlog)' calculator
         #    All of these steps are considered to be possible before any calculation
         #    and could have instead been done be slightly rewriting input/generate_inputs.py
-        #    or alternatively changing the input/pk.npz and input/kernels.npz files
+        #    or alternatively changing the input/pk.npz and input/kernels_fullwidth.npz files
         #    Since, however, we wanted to leave the directory structure intact,
         #    we do it here in a pre-processing step instead
 
@@ -144,7 +144,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         Na_pk = len(power)
 
         # 5) Get the growth factor and pass it as well (sampled on same scale factor grid as the P(k))
-        #   -> This could be in a file similar to the kernels.npz or pk.npz
+        #   -> This could be in a file similar to the kernels_fullwidth.npz or pk.npz
         #      Since below we derive it entirely from the file
         #      it is data that could also be easily provided alongside it
         self.a_pk = a
@@ -230,16 +230,16 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         for i1 in range(len(self.t_g)):
           for i2 in range(i1,len(self.t_g)):
             cls_m = cls_matter["dd"][(i1,i2)]
-            cls_l = ccl.angular_cl(self.cosmo, self.t_g[i1], self.t_g[i2], self.ell_limber, limber_integration_method='spline')
+            cls_l = ccl.angular_cl(self.cosmo, self.t_g[i1], self.t_g[i2], self.ell_limber, limber_integration_method='qag_quad')
             self.cls_gg.append(np.concatenate([cls_m,cls_l]))
           for i2 in range(len(self.t_s)):
             cls_m = cls_matter["dl"][(i1,i2)]
-            cls_l = ccl.angular_cl(self.cosmo, self.t_g[i1], self.t_s[i2], self.ell_limber, limber_integration_method='spline')
+            cls_l = ccl.angular_cl(self.cosmo, self.t_g[i1], self.t_s[i2], self.ell_limber, limber_integration_method='qag_quad')
             self.cls_gs.append(np.concatenate([cls_m,cls_l]))
         for i1 in range(len(self.t_s)):
           for i2 in range(i1,len(self.t_s)):
             cls_m = cls_matter["ll"][(i1,i2)]
-            cls_l = ccl.angular_cl(self.cosmo, self.t_s[i1], self.t_s[i2], self.ell_limber, limber_integration_method='spline')
+            cls_l = ccl.angular_cl(self.cosmo, self.t_s[i1], self.t_s[i2], self.ell_limber, limber_integration_method='qag_quad')
             self.cls_ss.append(np.concatenate([cls_m,cls_l]))
         self.cls_gg = np.array(self.cls_gg)
         self.cls_gs = np.array(self.cls_gs)
