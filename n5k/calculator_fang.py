@@ -197,7 +197,7 @@ class N5KCalculatorFKEM(N5KCalculatorBase):
 
 		def _get_cl_nonlimber_fang(self, t1, t2, ls, i1, i2, cl_type):
 
-				l_switch = 200
+				l_switch = float(self.config['l_nonlimber'])
 				if(cl_type=='gg'):
 					ls_nonlim = ls[ls<l_switch]
 					cls_limber_nonlin_part = self._get_cl_limber_nonlin_part(t1, t2, ls_nonlim)

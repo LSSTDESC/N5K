@@ -15,7 +15,8 @@ if __name__ == "__main__":
         plt.semilogx(ell, comp_vs_bm["sn_per_l"], label="SN %s"%(name))
         plt.semilogx(ell, cumulative_sn_per_l, label="Cumulative SN %s"%(name))
 
-    print(r"cumulative $\Delta\chi^2$ at l<200:", cumulative_sn_per_l[ell<200][:-1]**2)
+    print(r"l at l<200:", ell[ell<200])
+    print(r"cumulative $\Delta\chi^2$ at l<200:", cumulative_sn_per_l[ell<200]**2)
     plt.axhline(0, c="k", lw=1)
 
 
