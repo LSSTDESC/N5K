@@ -4,14 +4,22 @@ import numpy as np
 class N5KCalculatorBase(object):
     name = 'Base'
     needed_fields = ['output_prefix']
-    nb_g = 10
-    nb_s = 5
 
     def __init__(self, fname_config):
-        import yaml
+        if isinstance(fname_config, dict):
+            self.config = fname_config
+        else:
+            import yaml
 
-        with open(fname_config) as f:
-            self.config = yaml.safe_load(f)
+            with open(fname_config) as f:
+                self.config = yaml.safe_load(f)
+
+        self.nb_g = 10
+        self.nb_s = 5
+        if 'select_cl' in self.config:
+            self.nb_g = len(self.config['select_cl'])
+        if 'select_sh' in self.config:
+            self.nb_s = len(self.config['select_sh'])
 
         self._check_config_sanity()
 
@@ -45,13 +53,18 @@ class N5KCalculatorBase(object):
                 'A_IA': A_IA}
 
     def get_tracer_dndzs(self):
-        dNdz_file = np.load('input/dNdzs.npz')
+        filename = self.config.get('dndz_file', 'input/dNdzs_fullwidth.npz')
+        dNdz_file = np.load(filename)
         z_sh = dNdz_file['z_sh']
         dNdz_sh = dNdz_file['dNdz_sh']
         z_cl = dNdz_file['z_cl']
         dNdz_cl = dNdz_file['dNdz_cl']
-        return {'z_sh': z_sh, 'dNdz_sh': dNdz_sh.T,
-                'z_cl': z_cl, 'dNdz_cl': dNdz_cl.T}
+        if 'select_cl' in self.config:
+            dNdz_cl = np.array([dNdz_cl[:, i] for i in self.config['select_cl']]).T
+        if 'select_sh' in self.config:
+            dNdz_sh = np.array([dNdz_sh[:, i] for i in self.config['select_sh']]).T
+        return {'z_sh': z_sh, 'dNdz_sh': dNdz_sh,
+                'z_cl': z_cl, 'dNdz_cl': dNdz_cl}
 
     def get_noise_biases(self):
         from scipy.integrate import simps
@@ -76,7 +89,20 @@ class N5KCalculatorBase(object):
         return nl_cl, nl_sh
 
     def get_tracer_kernels(self):
-        return np.load("input/kernels.npz")
+        filename = self.config.get('kernel_file', 'input/kernels_fullwidth.npz')
+        d = np.load(filename)
+        kernels_cl = d['kernels_cl']
+        kernels_sh = d['kernels_sh']
+        if 'select_cl' in self.config:
+            kernels_cl = np.array([kernels_cl[i, :] for i in self.config['select_cl']])
+        if 'select_sh' in self.config:
+            kernels_sh = np.array([kernels_sh[i, :] for i in self.config['select_sh']])
+        return {'z_cl': d['z_cl'],
+                'chi_cl': d['chi_cl'],
+                'kernels_cl': kernels_cl,
+                'z_sh': d['z_sh'],
+                'chi_sh': d['chi_sh'],
+                'kernels_sh': kernels_sh}
 
     def get_ells(self):
         return np.unique(np.geomspace(2, 2000, 128).astype(int)).astype(float)
