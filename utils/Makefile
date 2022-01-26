@@ -50,11 +50,6 @@ endif
 	cd python; export CC=$(CC); $(PYTHON) autosetup.py install || $(PYTHON) autosetup.py install --user
 	echo "hello world"
 	rm python/autosetup.py
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> master
 
 clean:
 	rm -f libmatter.a
