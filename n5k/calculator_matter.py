@@ -75,11 +75,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         # -> Now we perform (!)preprocessing(!) steps relevant to the 'matter (FFTlog)' calculator
         #    All of these steps are considered to be possible before any calculation
         #    and could have instead been done be slightly rewriting input/generate_inputs.py
-<<<<<<< HEAD
-        #    or alternatively changing the input/pk.npz and input/kernels.npz files
-=======
         #    or alternatively changing the input/pk.npz and input/kernels_fullwidth.npz files
->>>>>>> master
         #    Since, however, we wanted to leave the directory structure intact,
         #    we do it here in a pre-processing step instead
 
