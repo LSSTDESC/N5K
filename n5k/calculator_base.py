@@ -48,9 +48,7 @@ class N5KCalculatorBase(object):
                         1.607983, 1.689579, 1.772899,
                         1.857700, 1.943754, 2.030887,
                         2.118943])
-        A_IA = np.full(5, 0.15)	
-        return {'b_g': b_g,
-                'A_IA': A_IA}
+        return {'b_g': b_g}
 
     def get_tracer_dndzs(self):
         filename = self.config.get('dndz_file', 'input/dNdzs_fullwidth.npz')
