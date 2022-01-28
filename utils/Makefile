@@ -51,7 +51,6 @@ endif
 	echo "hello world"
 	rm python/autosetup.py
 
-
 clean:
 	rm -f libmatter.a
 	rm -f build/*

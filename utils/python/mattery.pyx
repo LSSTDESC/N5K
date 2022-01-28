@@ -199,6 +199,9 @@ cdef class Matter:
             self.ma.tw_weights[nwd*ntw_ni+itw] = tw_ni_weights[nwd][itw]
           self.ma.tw_max[nwd]=tw_ni[nwd][-1]
           self.ma.tw_min[nwd]=tw_ni[nwd][0]
+        for nwd in range(ntr_ni,ntr_i):
+          self.ma.tw_max[nwd]=tw_i[nwd][-1]
+          self.ma.tw_min[nwd]=tw_i[nwd][0]
         for nwd in range(ntr_i):
           for itw in range(ntw_i):
             if self.ma.uses_intxi_logarithmic:
