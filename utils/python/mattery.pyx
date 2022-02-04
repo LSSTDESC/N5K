@@ -160,8 +160,8 @@ cdef class Matter:
         ntw_i = self.ma.integrated_tw_size
 
         # Allocating all the samplings
-        self.ma.tw_min = <double*>malloc(sizeof(double)*ntr_ni)
-        self.ma.tw_max = <double*>malloc(sizeof(double)*ntr_ni)
+        self.ma.tw_min = <double*>malloc(sizeof(double)*max(ntr_ni,ntr_i))
+        self.ma.tw_max = <double*>malloc(sizeof(double)*max(ntr_ni,ntr_i))
         self.ma.tw_sampling = <double*>malloc(sizeof(double)*self.ma.num_windows*ntw_ni)
         self.ma.integrated_tw_sampling = <double*>malloc(sizeof(double)*self.ma.num_windows*ntw_i)
         self.ma.exp_integrated_tw_sampling = <double*>malloc(sizeof(double)*self.ma.num_windows*ntw_i)
