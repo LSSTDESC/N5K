@@ -11,6 +11,6 @@ do
     echo $OMP_NUM_THREADS >> outputs/times_MATTER.txt
     python timer.py confs/config_matter.yml MATTER 10 none >> outputs/times_MATTER.txt
     echo $OMP_NUM_THREADS >> outputs/times_Levin.txt
-    python timer.py confs/config_levin.yml LEVIN 10 none >> outputs/times_Levin.txt
+    python timer.py confs/config_levin.yml Levin 10 none >> outputs/times_Levin.txt
 done
 unset OMP_NUM_THREADS

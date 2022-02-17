@@ -15,7 +15,7 @@ python benchmarker.py confs/config_matter.yml MATTER 200 half
 python benchmarker.py confs/config_matter.yml MATTER 200 quarter
 
 echo "Levin"
-python benchmarker.py confs/config_levin.yml LEVIN 200 none
-python benchmarker.py confs/config_levin.yml LEVIN 200 full
-python benchmarker.py confs/config_levin.yml LEVIN 200 half
-python benchmarker.py confs/config_levin.yml LEVIN 200 quarter
+python benchmarker.py confs/config_levin.yml Levin 200 none
+python benchmarker.py confs/config_levin.yml Levin 200 full
+python benchmarker.py confs/config_levin.yml Levin 200 half
+python benchmarker.py confs/config_levin.yml Levin 200 quarter

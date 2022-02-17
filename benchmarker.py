@@ -18,8 +18,8 @@ conf_test = {'output_prefix': 'outputs/tester',
 if width != 'none':
     name_lc = name.lower()
     conf_test['benchmark_prefix'] = f'tests/benchmarks_nl_{width}'
-    conf['dndz_file'] = f'input/additional_dNdzs/dNdzs_{width}width.npz'
-    conf['kernel_file'] = f'input/additional_kernels/kernels_{width}width.npz'
+    conf['dndz_file'] = f'input/dNdzs_{width}width.npz'
+    conf['kernel_file'] = f'input/kernels_{width}width.npz'
     conf['output_prefix'] = f'outputs/{name_lc}_{width}'
 
 ct = n5k.N5KCalculatorTester(conf_test)

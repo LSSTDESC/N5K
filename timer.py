@@ -14,6 +14,7 @@ def time_run(cls, config, niter):
         c.run()
         tf = time.time()
         ts[i] = tf-t0
+        print('t=', ts[i])
     tmean = np.mean(ts[1:])
     terr = np.std(ts[1:])/np.sqrt(niter)
     c.write_output()
