@@ -3,8 +3,8 @@ from .calculator_base import N5KCalculatorBase
 
 import levinpower
 
-class N5KCalculatorLEVIN(N5KCalculatorBase):
-    name = 'LEVIN'
+class N5KCalculatorLevin(N5KCalculatorBase):
+    name = 'Levin'
 
     def setup(self):
         # Initialize cosmology
