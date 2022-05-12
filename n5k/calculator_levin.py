@@ -22,7 +22,8 @@ class N5KCalculatorLevin(N5KCalculatorBase):
                         for k in ["tol_rel",
                                   "limber_tolerance",
                                   "min_interval",
-                                  "maximum_number_subintervals"]
+                                  "maximum_number_subintervals",
+                                  "n_collocation"]
                         if k in self.config}
 
         ell = self.get_ells().astype(int)
