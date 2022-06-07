@@ -87,7 +87,7 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         #  -> Note, that this step would be unnecessary, if the files would be storing
         #     only the relevant nonzero contributions
         #  -> We iterate through each window function, sample it on a very broad grid, and check what is the maximum value
-        threshold = 0.
+        threshold = 1e-50
         chi_test = ker['chi_cl']
         self.chi_g_mins,self.chi_g_maxs = np.empty((2,Ntg),dtype="float64")
         self.chi_s_mins,self.chi_s_maxs = np.zeros((2,Nts),dtype="float64")
@@ -131,37 +131,14 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
 
           for itr in range(kern.shape[0]):
             self.kerfac_g[i] += kern[itr]*trans[itr]
-        from scipy.interpolate import interp1d
-        for i in range(Ntg):
-          self.kerfac_g[i] = interp1d(np.log(ker['chi_cl']),ker['kernels_cl'][i],bounds_error=False,fill_value=0)(np.log(self.chi_nonintegrated[i]))
+
         self.kerfac_s = np.zeros((Nts,Nchi_integrated))
         for i in range(Nts):
           kern = self.t_s[i].get_kernel(self.chi_integrated[i])
           trans = self.t_s[i].get_transfer(0.,ccl.scale_factor_of_chi(self.cosmo,self.chi_integrated[i]))
+
           for itr in range(kern.shape[0]):
             self.kerfac_s[i][1:] += (kern[itr][1:]*trans[itr][1:]/self.chi_integrated[i][1:]**2) # Ill defined for the 0th index, keep it as 0
-
-        for i in range(Nts):
-          self.kerfac_s[i] = interp1d(np.log(ker['chi_sh']),ker['kernels_sh'][i],bounds_error=False,fill_value=0)(np.log(self.chi_integrated[i]))/self.chi_integrated[i]**2
-
-        #plt.figure()
-        #print(self.chi_integrated[2][1])
-        #print(self.kerfac_s[2][1])
-        ##plt.plot(self.chi_integrated[2],self.kerfac_s[2])
-        ##plt.plot(ker['chi_sh'],ker['kernels_sh'][2]/ker['chi_sh']**2)
-        ##plt.plot(self.chi_integrated[2],np.polyval(np.polyfit(ker['chi_sh'][1:20],ker['kernels_sh'][2][1:20],deg=3),self.chi_integrated[2])/self.chi_integrated[2]**2,color="black")
-        #plt.plot(self.chi_integrated[2],self.kerfac_s[2]*self.chi_integrated[2])
-        #from scipy.interpolate import interp1d
-        #plt.plot(self.chi_nonintegrated[7],interp1d(self.chi_integrated[3],self.kerfac_s[3])(self.chi_nonintegrated[7])*self.kerfac_g[7])
-        #plt.plot(self.chi_integrated[3],self.kerfac_s[3])
-
-        for i in range(Nts):
-          self.kerfac_s[i][:6] = np.polyval(np.polyfit(ker['chi_sh'][1:10],ker['kernels_sh'][i][1:10],deg=2),self.chi_integrated[i][:6])/self.chi_integrated[i][:6]**2
-
-        #plt.plot(ker['chi_sh'],ker['kernels_sh'][2]/ker['chi_sh']**1)
-        #plt.plot(self.chi_integrated[2],np.polyval(np.polyfit(ker['chi_sh'][1:10],ker['kernels_sh'][2][1:10],deg=3),self.chi_integrated[2])/self.chi_integrated[2]**1,color="black")
-        #plt.show()
-        #quit()
 
         # Shorthand notations:
         power = dpk['pk_nl'][::-1]
@@ -172,10 +149,6 @@ class N5KCalculatorMATTER(N5KCalculatorBase):
         #      Since below we derive it entirely from the file
         #      it is data that could also be easily provided alongside it
         self.a_pk = a
-        #self.growth = ccl.growth_rate(self.cosmo, self.a_pk) #<-- Actually, it turns out this is usuall not accurate enough. Instead, we replace it by pk_growth
-        pk_growth = np.empty((Na_pk,))
-        for i in range(Na_pk):
-          pk_growth[i] = np.sqrt(np.mean(power[i]/power[-1]))
         pk_growth = ccl.growth_factor(self.cosmo, self.a_pk)
         self.growth = pk_growth
 

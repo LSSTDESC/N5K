@@ -3044,8 +3044,8 @@ int matter_get_half_integrand(struct matters* pma,
                  pma->error_message,
                  "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x1 = %.10e",x0,t,pma->tau0,x1);
       if(
-        (x1>pma->tw_max[index_wd2] && (!(pma->has_integrated_windows && matter_is_integrated(index_radtp2))))
-        ||x1<pma->tw_min[index_wd2]){
+        (x1>pma->tw_max[pmw->window_offset+index_wd2] && (!(pma->has_integrated_windows && matter_is_integrated(index_radtp2))))
+        ||x1<pma->tw_min[pmw->window_offset+index_wd2]){
         //The point x1 is outside of the window w2
         x1flag=_FALSE_;
       }
@@ -3301,14 +3301,14 @@ int matter_get_ttau_integrand(struct matters* pma,
                  pma->error_message,
                  "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x2 = %.10e",x0,t,pma->tau0,x2);
       if(
-        (x1>pma->tw_max[index_wd2] && (!(pma->has_integrated_windows && pmw->is_integrated_radtp2)))
-        ||x1<pma->tw_min[index_wd2]){
+        (x1>pma->tw_max[pmw->window_offset+index_wd2] && (!(pma->has_integrated_windows && pmw->is_integrated_radtp2)))
+        ||x1<pma->tw_min[pmw->window_offset+index_wd2]){
         //The point x1 is outside of the window w2
         x1flag=_FALSE_;
       }
       if(
-        (x2>pma->tw_max[index_wd2] && (!(pma->has_integrated_windows && pmw->is_integrated_radtp2)))
-        ||x2<pma->tw_min[index_wd2]){
+        (x2>pma->tw_max[pmw->window_offset+index_wd2] && (!(pma->has_integrated_windows && pmw->is_integrated_radtp2)))
+        ||x2<pma->tw_min[pmw->window_offset+index_wd2]){
         //The point x2 is outside of the window w2
         x2flag=_FALSE_;
       }
@@ -4098,10 +4098,13 @@ int matter_integrate_each(struct matters* pma,
             pmw->tau_size = pma->integrated_tw_size;
             pmw->tau_sampling = pma->integrated_tw_sampling;
           }
+          pmw->window_offset = 0;
           if(pmw->is_integrated_radtp2){
             t_min = 0.0+pma->bi_maximal_t_offset;//186+pma->bi_maximal_t_offset;
             t_max = 1.0-pma->bi_maximal_t_offset;//186-pma->bi_maximal_t_offset found important;
+            pmw->window_offset = pma->num_windows_per_cltp[pmw->index_cltp1];
           }
+
           if(pma->matter_verbose > MATTER_VERBOSITY_CLCALCULATION && pma->matter_verbose > MATTER_VERBOSITY_RANGES && !MATTER_REWRITE_PRINTING){
             printf(" -> t range from %.10e to %.10e \n",t_min,t_max);
           }
