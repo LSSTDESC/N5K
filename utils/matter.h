@@ -440,6 +440,8 @@ struct matters_workspace{
   int N_threads;
   struct matters_vector** pmv; /**< array of pointers, one for each thread */
 
+  int window_offset;
+
 };
 #ifdef __cplusplus
 extern "C" {

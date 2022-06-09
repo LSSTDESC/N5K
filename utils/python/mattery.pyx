@@ -160,8 +160,8 @@ cdef class Matter:
         ntw_i = self.ma.integrated_tw_size
 
         # Allocating all the samplings
-        self.ma.tw_min = <double*>malloc(sizeof(double)*max(ntr_ni,ntr_i))
-        self.ma.tw_max = <double*>malloc(sizeof(double)*max(ntr_ni,ntr_i))
+        self.ma.tw_min = <double*>malloc(sizeof(double)*(ntr_ni+ntr_i))
+        self.ma.tw_max = <double*>malloc(sizeof(double)*(ntr_ni+ntr_i))
         self.ma.tw_sampling = <double*>malloc(sizeof(double)*self.ma.num_windows*ntw_ni)
         self.ma.integrated_tw_sampling = <double*>malloc(sizeof(double)*self.ma.num_windows*ntw_i)
         self.ma.exp_integrated_tw_sampling = <double*>malloc(sizeof(double)*self.ma.num_windows*ntw_i)
@@ -199,9 +199,9 @@ cdef class Matter:
             self.ma.tw_weights[nwd*ntw_ni+itw] = tw_ni_weights[nwd][itw]
           self.ma.tw_max[nwd]=tw_ni[nwd][-1]
           self.ma.tw_min[nwd]=tw_ni[nwd][0]
-        for nwd in range(ntr_ni,ntr_i):
-          self.ma.tw_max[nwd]=tw_i[nwd][-1]
-          self.ma.tw_min[nwd]=tw_i[nwd][0]
+        for nwd in range(ntr_i):
+          self.ma.tw_max[ntr_ni+nwd]=tw_i[nwd][-1]
+          self.ma.tw_min[ntr_ni+nwd]=tw_i[nwd][0]
         for nwd in range(ntr_i):
           for itw in range(ntw_i):
             if self.ma.uses_intxi_logarithmic:
