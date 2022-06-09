@@ -73,7 +73,7 @@ class N5KCalculatorBase(object):
         ndens_s = 27.
         # Ellipticity scatter per component
         e_rms = 0.28
-
+        
         ndic = self.get_tracer_dndzs()
         nc_ints = np.array([simps(n, x=ndic['z_cl'])
                             for n in ndic['dNdz_cl'].T])
