@@ -3026,51 +3026,51 @@ int matter_get_half_integrand(struct matters* pma,
             pma->error_message);
   for(index_tw_local=0;index_tw_local<pmw->tau_size;++index_tw_local){
 
-    x1flag = _TRUE_;
-
-    if(pma->uses_intxi_logarithmic && pmw->is_integrated_radtp1 && pmw->is_integrated_radtp2){
-      x0 = pma->tau0-pma->exp_integrated_tw_sampling[index_wd1*pmw->tau_size+index_tw_local];//exp(pmw->tau_sampling[index_wd1*pmw->tau_size+index_tw_local]);
-      x1 = pma->tau0-t*pma->exp_integrated_tw_sampling[index_wd1*pmw->tau_size+index_tw_local];// - pma->small_log_offset;
-    }
-    else{
-      x0 = pmw->tau_sampling[index_wd1*pmw->tau_size+index_tw_local];
-      x1 = pma->tau0-t*(pma->tau0-x0);// - pma->small_log_offset;
-    }
-    class_test(x0>pma->tau0,
-               pma->error_message,
-               "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x0 = %.10e",x0,t,pma->tau0,x0);
-    class_test(x1>pma->tau0,
-               pma->error_message,
-               "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x1 = %.10e",x0,t,pma->tau0,x1);
-    if(
-      (x1>pma->tw_max[index_wd2] && (!(pma->has_integrated_windows && matter_is_integrated(index_radtp2))))
-      ||x1<pma->tw_min[index_wd2]){
-      //The point x1 is outside of the window w2
-      x1flag=_FALSE_;
-    }
-    class_call(matter_spline_hunt(pma->tau_sampling,
-                                  pma->tau_size,
-                                  x0,//285+pma->small_log_offset,
-                                  &inf0,
-                                  &h0,
-                                  &a0,
-                                  &b0,
-                                  pma->error_message),
-               pma->error_message,
-               pma->error_message);
-    if(x1flag==_TRUE_){
-     class_call(matter_spline_hunt(pma->tau_sampling,
-                                   pma->tau_size,
-                                   x1,//285+pma->small_log_offset,
-                                   &inf1,
-                                   &h1,
-                                   &a1,
-                                   &b1,
-                                   pma->error_message),
-               pma->error_message,
-               pma->error_message);
-    }
     if(!pma->uses_separability){
+      x1flag = _TRUE_;
+
+      if(pma->uses_intxi_logarithmic && pmw->is_integrated_radtp1 && pmw->is_integrated_radtp2){
+        x0 = pma->tau0-pma->exp_integrated_tw_sampling[index_wd1*pmw->tau_size+index_tw_local];//exp(pmw->tau_sampling[index_wd1*pmw->tau_size+index_tw_local]);
+        x1 = pma->tau0-t*pma->exp_integrated_tw_sampling[index_wd1*pmw->tau_size+index_tw_local];// - pma->small_log_offset;
+      }
+      else{
+        x0 = pmw->tau_sampling[index_wd1*pmw->tau_size+index_tw_local];
+        x1 = pma->tau0-t*(pma->tau0-x0);// - pma->small_log_offset;
+      }
+      class_test(x0>pma->tau0,
+                 pma->error_message,
+                 "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x0 = %.10e",x0,t,pma->tau0,x0);
+      class_test(x1>pma->tau0,
+                 pma->error_message,
+                 "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x1 = %.10e",x0,t,pma->tau0,x1);
+      if(
+        (x1>pma->tw_max[pmw->window_offset+index_wd2] && (!(pma->has_integrated_windows && matter_is_integrated(index_radtp2))))
+        ||x1<pma->tw_min[pmw->window_offset+index_wd2]){
+        //The point x1 is outside of the window w2
+        x1flag=_FALSE_;
+      }
+      class_call(matter_spline_hunt(pma->tau_sampling,
+                                    pma->tau_size,
+                                    x0,//285+pma->small_log_offset,
+                                    &inf0,
+                                    &h0,
+                                    &a0,
+                                    &b0,
+                                    pma->error_message),
+                 pma->error_message,
+                 pma->error_message);
+      if(x1flag==_TRUE_){
+       class_call(matter_spline_hunt(pma->tau_sampling,
+                                     pma->tau_size,
+                                     x1,//285+pma->small_log_offset,
+                                     &inf1,
+                                     &h1,
+                                     &a1,
+                                     &b1,
+                                     pma->error_message),
+                 pma->error_message,
+                 pma->error_message);
+      }
       if(x1flag==_TRUE_){
         fft_index00 = (inf0)*pma->tau_size+(inf1);
         fft_index01 = (inf0)*pma->tau_size+(inf1+1);
@@ -3280,74 +3280,72 @@ int matter_get_ttau_integrand(struct matters* pma,
 
   for(index_tw_local=0;index_tw_local<pmw->tau_size;++index_tw_local){
 
-    x1flag = _TRUE_;
-    x2flag = _TRUE_;
+    if(!pma->uses_separability){
+      x1flag = _TRUE_;
+      x2flag = _TRUE_;
 
-    if(pma->uses_intxi_logarithmic && pmw->is_integrated_radtp1 && pmw->is_integrated_radtp2){
-      x0 = pma->tau0-pma->exp_integrated_tw_sampling[index_wd1*pmw->tau_size+index_tw_local];
-    }else{
-      x0 = pmw->tau_sampling[index_wd1*pmw->tau_size+index_tw_local];
-    }
-    x1 = pma->tau0-t*(pma->tau0-x0);// - pma->small_log_offset;
-    x2 = pma->tau0-(1.0/t)*(pma->tau0-x0);// - pma->small_log_offset;
-    class_test(x0>pma->tau0,
-               pma->error_message,
-               "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x0 = %.10e",x0,t,pma->tau0,x0);
-    class_test(x1>pma->tau0,
-               pma->error_message,
-               "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x1 = %.10e",x0,t,pma->tau0,x1);
-    class_test(x2>pma->tau0,
-               pma->error_message,
-               "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x2 = %.10e",x0,t,pma->tau0,x2);
-    if(
-      (x1>pma->tw_max[index_wd2] && (!(pma->has_integrated_windows && pmw->is_integrated_radtp2)))
-      ||x1<pma->tw_min[index_wd2]){
-      //The point x1 is outside of the window w2
-      x1flag=_FALSE_;
-    }
-    if(
-      (x2>pma->tw_max[index_wd2] && (!(pma->has_integrated_windows && pmw->is_integrated_radtp2)))
-      ||x2<pma->tw_min[index_wd2]){
-      //The point x2 is outside of the window w2
-      x2flag=_FALSE_;
-    }
-    class_call(matter_spline_hunt(pma->tau_sampling,
-                                  pma->tau_size,
-                                  x0,
-                                  &inf0,
-                                  &h0,
-                                  &a0,
-                                  &b0,
-                                  pma->error_message),
-               pma->error_message,
-               pma->error_message);
-    if(x1flag==_TRUE_){
-       class_call(matter_spline_hunt(pma->tau_sampling,
-                                     pma->tau_size,
-                                     x1,
-                                     &inf1,
-                                     &h1,
-                                     &a1,
-                                     &b1,
-                                     pma->error_message),
+      if(pma->uses_intxi_logarithmic && pmw->is_integrated_radtp1 && pmw->is_integrated_radtp2){
+        x0 = pma->tau0-pma->exp_integrated_tw_sampling[index_wd1*pmw->tau_size+index_tw_local];
+      }else{
+        x0 = pmw->tau_sampling[index_wd1*pmw->tau_size+index_tw_local];
+      }
+      x1 = pma->tau0-t*(pma->tau0-x0);// - pma->small_log_offset;
+      x2 = pma->tau0-(1.0/t)*(pma->tau0-x0);// - pma->small_log_offset;
+      class_test(x0>pma->tau0,
+                 pma->error_message,
+                 "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x0 = %.10e",x0,t,pma->tau0,x0);
+      class_test(x1>pma->tau0,
+                 pma->error_message,
+                 "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x1 = %.10e",x0,t,pma->tau0,x1);
+      class_test(x2>pma->tau0,
+                 pma->error_message,
+                 "with x0 = %.10e , t = %.10e ,tau0 = %.10e , x2 = %.10e",x0,t,pma->tau0,x2);
+      if(
+        (x1>pma->tw_max[pmw->window_offset+index_wd2] && (!(pma->has_integrated_windows && pmw->is_integrated_radtp2)))
+        ||x1<pma->tw_min[pmw->window_offset+index_wd2]){
+        //The point x1 is outside of the window w2
+        x1flag=_FALSE_;
+      }
+      if(
+        (x2>pma->tw_max[pmw->window_offset+index_wd2] && (!(pma->has_integrated_windows && pmw->is_integrated_radtp2)))
+        ||x2<pma->tw_min[pmw->window_offset+index_wd2]){
+        //The point x2 is outside of the window w2
+        x2flag=_FALSE_;
+      }
+      class_call(matter_spline_hunt(pma->tau_sampling,
+                                    pma->tau_size,
+                                    x0,
+                                    &inf0,
+                                    &h0,
+                                    &a0,
+                                    &b0,
+                                    pma->error_message),
                  pma->error_message,
                  pma->error_message);
-    }
-    if(x2flag==_TRUE_){
-        class_call(matter_spline_hunt(pma->tau_sampling,
-                                      pma->tau_size,
-                                      x2,
-                                      &inf2,
-                                      &h2,
-                                      &a2,
-                                      &b2,
-                                      pma->error_message),
+      if(x1flag==_TRUE_){
+         class_call(matter_spline_hunt(pma->tau_sampling,
+                                       pma->tau_size,
+                                       x1,
+                                       &inf1,
+                                       &h1,
+                                       &a1,
+                                       &b1,
+                                       pma->error_message),
                    pma->error_message,
                    pma->error_message);
-    }
-
-
-    if(!pma->uses_separability){
+      }
+      if(x2flag==_TRUE_){
+          class_call(matter_spline_hunt(pma->tau_sampling,
+                                        pma->tau_size,
+                                        x2,
+                                        &inf2,
+                                        &h2,
+                                        &a2,
+                                        &b2,
+                                        pma->error_message),
+                     pma->error_message,
+                     pma->error_message);
+      }
 
       if(x1flag==_TRUE_){
         fft_index00 = (inf0)*pma->tau_size+(inf1);
@@ -4100,10 +4098,13 @@ int matter_integrate_each(struct matters* pma,
             pmw->tau_size = pma->integrated_tw_size;
             pmw->tau_sampling = pma->integrated_tw_sampling;
           }
+          pmw->window_offset = 0;
           if(pmw->is_integrated_radtp2){
             t_min = 0.0+pma->bi_maximal_t_offset;//186+pma->bi_maximal_t_offset;
             t_max = 1.0-pma->bi_maximal_t_offset;//186-pma->bi_maximal_t_offset found important;
+            pmw->window_offset = pma->num_windows_per_cltp[pmw->index_cltp1];
           }
+
           if(pma->matter_verbose > MATTER_VERBOSITY_CLCALCULATION && pma->matter_verbose > MATTER_VERBOSITY_RANGES && !MATTER_REWRITE_PRINTING){
             printf(" -> t range from %.10e to %.10e \n",t_min,t_max);
           }
@@ -4128,7 +4129,12 @@ int matter_integrate_each(struct matters* pma,
            *
            * Now we can advance to integrating the final Cl's
            * */
+          //#pragma OMP parallel for firstprivate(pma,pmw,index_radtp2,index_radtp1,index_tilt1_tilt2,integrated_t_offset,t_max,t_min,y_max,y_min,sum_l) private(index_t, index_l, index_coeff,sum_temp, t,intxi_local_real,intxi_local_imag)
+          double* ixr = pmw->intxi_real[index_radtp1*pma->radtp_size_total+index_radtp2];
+          double* ixi = pmw->intxi_imag[index_radtp1*pma->radtp_size_total+index_radtp2];
           for(index_l=0;index_l<pma->l_size;++index_l){
+            double** wbr = pmw->window_bessel_real[index_l];
+            double** wbi = pmw->window_bessel_imag[index_l];
             double sum_t = 0.0;
             for(index_t=0;index_t<pma->t_size;++index_t){
               matter_get_t_orig(index_t)
@@ -4147,24 +4153,25 @@ int matter_integrate_each(struct matters* pma,
                *   of having a real integrand
                *
                * */
-              intxi_local_real = pmw->intxi_real[index_radtp1*pma->radtp_size_total+index_radtp2][0*pma->t_size+index_t];
-              intxi_local_imag = pmw->intxi_imag[index_radtp1*pma->radtp_size_total+index_radtp2][0*pma->t_size+index_t];
-              bes_local_real = pmw->window_bessel_real[index_l][index_tilt1_tilt2*pma->size_fft_result+0][index_t+integrated_t_offset];
-              bes_local_imag = pmw->window_bessel_imag[index_l][index_tilt1_tilt2*pma->size_fft_result+0][index_t+integrated_t_offset];
+
+              intxi_local_real = ixr[0*pma->t_size+index_t];
+              intxi_local_imag = ixi[0*pma->t_size+index_t];
+              bes_local_real = wbr[index_tilt1_tilt2*pma->size_fft_result+0][index_t+integrated_t_offset];
+              bes_local_imag = wbi[index_tilt1_tilt2*pma->size_fft_result+0][index_t+integrated_t_offset];
               sum_temp +=intxi_local_real*bes_local_real-intxi_local_imag*bes_local_imag;
 
               if(pma->size_fft_cutoff==pma->size_fft_result){
-                intxi_local_real = pmw->intxi_real[index_radtp1*pma->radtp_size_total+index_radtp2][(pma->size_fft_result-1)*pma->t_size+index_t];
-                intxi_local_imag = pmw->intxi_imag[index_radtp1*pma->radtp_size_total+index_radtp2][(pma->size_fft_result-1)*pma->t_size+index_t];
-                bes_local_real = pmw->window_bessel_real[index_l][index_tilt1_tilt2*pma->size_fft_result+(pma->size_fft_result-1)][index_t+integrated_t_offset];
-                bes_local_imag = pmw->window_bessel_imag[index_l][index_tilt1_tilt2*pma->size_fft_result+(pma->size_fft_result-1)][index_t+integrated_t_offset];
+                intxi_local_real = ixr[(pma->size_fft_result-1)*pma->t_size+index_t];
+                intxi_local_imag = ixi[(pma->size_fft_result-1)*pma->t_size+index_t];
+                bes_local_real = wbr[index_tilt1_tilt2*pma->size_fft_result+(pma->size_fft_result-1)][index_t+integrated_t_offset];
+                bes_local_imag = wbi[index_tilt1_tilt2*pma->size_fft_result+(pma->size_fft_result-1)][index_t+integrated_t_offset];
                 sum_temp +=intxi_local_real*bes_local_real-intxi_local_imag*bes_local_imag;
               }
               for(index_coeff=1;index_coeff<pma->size_fft_cutoff-1;++index_coeff){
-                intxi_local_real = pmw->intxi_real[index_radtp1*pma->radtp_size_total+index_radtp2][index_coeff*pma->t_size+index_t];
-                intxi_local_imag = pmw->intxi_imag[index_radtp1*pma->radtp_size_total+index_radtp2][index_coeff*pma->t_size+index_t];
-                bes_local_real = pmw->window_bessel_real[index_l][index_tilt1_tilt2*pma->size_fft_result+index_coeff][index_t+integrated_t_offset];
-                bes_local_imag = pmw->window_bessel_imag[index_l][index_tilt1_tilt2*pma->size_fft_result+index_coeff][index_t+integrated_t_offset];
+                intxi_local_real = ixr[index_coeff*pma->t_size+index_t];
+                intxi_local_imag = ixi[index_coeff*pma->t_size+index_t];
+                bes_local_real = wbr[index_tilt1_tilt2*pma->size_fft_result+index_coeff][index_t+integrated_t_offset];
+                bes_local_imag = wbi[index_tilt1_tilt2*pma->size_fft_result+index_coeff][index_t+integrated_t_offset];
                 sum_temp +=2.0*(intxi_local_real*bes_local_real-intxi_local_imag*bes_local_imag);
               }
               if((pma->uses_integration == matter_integrate_tw_logt) && !pma->uses_limber_approximation){
